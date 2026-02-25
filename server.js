@@ -18,7 +18,7 @@ app.get('/test', (req, res) => {
 
 app.post('/post', (req, res) => {
   const data = req.body;
-  req.message = 'hiii!';
+
   res.json(data);
 })
 
