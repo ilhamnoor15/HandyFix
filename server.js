@@ -5,10 +5,17 @@ const { createClient } = require('@libsql/client');
 
 const PORT = process.env.PORT || 3000;
 
-const db = createClient({
+
+function getDbClient() {
+  if (!process.env.TURSO_LINK || !process.env.TURSO_TOKEN) {
+    throw new Error('Database not configured');
+  }
+
+  return createClient({
     url: process.env.TURSO_LINK,
     authToken: process.env.TURSO_TOKEN,
-});
+  });
+}
 
 
 app.use(express.json());
@@ -37,6 +44,8 @@ app.post('/post', (req, res) => {
 })
 
 app.get('/test-db', async (req, res) => {
+  const db =
+  getDbClient(); 
   try {
     const result = await db.execute('SELECT 1 as result');
     res.json({ success: true, message: 'Connected to Turso DB!', data: result.rows });
@@ -47,6 +56,8 @@ app.get('/test-db', async (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
+
+  const db = getDbClient();
   try {
     const { email, password } = req.body;
 
