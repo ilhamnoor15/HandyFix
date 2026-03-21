@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --maroon:      #7a1d1d;
+      --dark-orange: #c2410c;
+      --dirty-white: #f5f0e6;
+      --black:       #111;
+      --gray:        #555;
+      --light-gray:  #ddd;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--dirty-white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--maroon);
+      color: white;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+
+    .logo       { font-weight: bold; font-size: 1.5rem; }
+    .panel-name { font-size: 1.35rem; letter-spacing: 1.2px; }
+    .right      { display: flex; align-items: center; gap: 1.8rem; }
+    .bell       { font-size: 1.4rem; cursor: pointer; }
+    .profile    { font-size: 1.15rem; }
+    .hamburger  { font-size: 1.7rem; cursor: pointer; display: none; color: white; }
+
+    .sidebar {
+      width: 240px;
+      background: var(--dark-orange);
+      color: white;
+      height: calc(100vh - 64px);
+      position: fixed;
+      top: 64px;
+      left: 0;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 1.2rem 0;
+    }
+
+    .sidebar li {
+      padding: 1rem 1.6rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .sidebar li:hover,
+    .sidebar li.active {
+      background: rgba(0,0,0,0.25);
+    }
+
+    .sidebar i {
+      margin-right: 12px;
+      width: 22px;
+      text-align: center;
+    }
+
+    .main {
+      margin-left: 240px;
+      margin-top: 64px;
+      padding: 2rem;
+      min-height: calc(100vh - 64px);
+    }
+
+    h1 {
+      color: var(--maroon);
+      margin-bottom: 2rem;
+      font-size: 2rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.6rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.6rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+      color: var(--gray);
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .stat-card .value {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--maroon);
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main {
+        margin-left: 0;
+      }
+      .hamburger {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">HandyFix</div>
+  <div class="panel-name">ADMIN PANEL</div>
+  <div class="right">
+    <i class="fas fa-bell bell"></i>
+    <span class="profile">Admin Name</span>
+    <i class="fas fa-bars hamburger" id="menuBtn"></i>
+  </div>
+</header>
+
+<nav class="sidebar" id="sidebar">
+  <ul>
+    <li class="active" data-page="Admin Dashboard.html">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </li>
+    <li data-page="Service Requests.html">
+      <i class="fas fa-list-ul"></i> Requests
+    </li>
+    <li data-page="Contractor.html">
+      <i class="fas fa-hard-hat"></i> Contractors
+    </li>
+    <li data-page="Customer.html">
+      <i class="fas fa-users"></i> Customers
+    </li>
+    <li data-page="Assignment.html">
+      <i class="fas fa-link"></i> Assignments
+    </li>
+    <li data-page="Messages.html">
+      <i class="fas fa-comment-dots"></i> Messages
+    </li>
+    <li data-page="Reports.html">
+      <i class="fas fa-chart-bar"></i> Reports
+    </li>
+    <li data-page="Settings.html">
+      <i class="fas fa-cog"></i> Settings
+    </li>
+    <li data-page="Login.html">
+      <i class="fas fa-sign-out-alt"></i> Logout</li>
+  </ul>
+</nav>
+
+<main class="main">
+  <h1>Dashboard</h1>
+
+  <div class="stats">
+    <div class="stat-card">
+      <h3>Most Requested Service</h3>
+      <div class="value">Plumbing</div>
+    </div>
+    <div class="stat-card">
+      <h3>Active Contractors</h3>
+      <div class="value">12</div>
+    </div>
+    <div class="stat-card">
+      <h3>Jobs Completed</h3>
+      <div class="value">25</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.getElementById('menuBtn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  document.querySelectorAll('.sidebar li').forEach(item => {
+    item.addEventListener('click', function() {
+      const page = this.getAttribute('data-page');
+      if (page) {
+        window.location.href = page;
+      }
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentFile = window.location.pathname.split('/').pop() || 'Reports.html';
+    document.querySelectorAll('.sidebar li').forEach(li => {
+      const page = li.getAttribute('data-page');
+      if (page === currentFile) {
+        li.classList.add('active');
+      } else {
+        li.classList.remove('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
