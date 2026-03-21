@@ -4,12 +4,12 @@ const db = require("../routes/database");
 
 
 
-app.post("/api/register", async (req, res) => {
+app.post("/register", async (req, res) => {
   console.log("test 1");
 
   /*
   CREATE TABLE users (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
+id INTEGER PRIMARY KEY AUTOINC REMENT,
 first_name VARCHAR(100) NOT NULL,
 last_name VARCHAR(100) NOT NULL,
 age INT,

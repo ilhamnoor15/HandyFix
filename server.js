@@ -11,13 +11,13 @@ const db = require("./routes/database");
 app.use(express.json());
 
 const loginRouter = require("./routes/login");
-app.use("/api/login", loginRouter);
+app.use("/api/", loginRouter);
 
 const registerRouter = require("./routes/register");
-app.use("/api/register",registerRouter);
+app.use("/api/",registerRouter);
 
 const testRouter =require("./routes/test");
-app.use("/api/test", testRouter);
+app.use("/api/", testRouter);
 
 const userPagesRouter = require("./routes/pages/userPages");
 app.use("/user", userPagesRouter);
