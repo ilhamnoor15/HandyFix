@@ -227,26 +227,17 @@
     <table>
       <thead>
         <tr>
-          <th>Customer ID</th>
-          <th>Name</th>
+          <th>ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
           <th>Contact</th>
-          <th>Address</th>
+          <th>Age</th>
+          <th>Type</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>301</td>
-          <td>Juan Dela Cruz</td>
-          <td>09123456789</td>
-          <td>QC</td>
-        </tr>
-        <tr>
-          <td>302</td>
-          <td>Maria Santos</td>
-          <td>09876543210</td>
-          <td>QC</td>
-        </tr>
-  
+      <tbody id="customerTableBody">
+        <!-- Rows will be populated dynamically from JSON -->
       </tbody>
     </table>
   </div>
@@ -260,9 +251,19 @@
   <div id="formContainer">
     <h3 id="formTitle">Add Customer</h3>
 
-    <input type="text" id="name" placeholder="Name">
+    <input type="text" id="firstName" placeholder="First Name">
+    <input type="text" id="lastName" placeholder="Last Name">
+    <input type="email" id="email" placeholder="Email">
     <input type="text" id="contact" placeholder="Contact Number">
+    <input type="number" id="age" placeholder="Age">
     <input type="text" id="address" placeholder="Address">
+    <select id="type">
+      <option value="">Select Type</option>
+      <option value="user">User</option>
+      <option value="contractor">Contractor</option>
+      <option value="admin">Admin</option>
+    </select>
+    <input type="text" id="password" placeholder="Password">
 
     <br><br>
 
@@ -273,6 +274,53 @@
 </main>
 
 <script>
+  // Customer data in JSON format
+
+  async function fetchCustomers() {
+    try {
+      const response = await fetch('http://localhost:3000/api/AllUsers');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      return [];
+    }
+  }
+
+  let customersData = [];
+
+  let selectedRow = null;
+  let editMode = false;
+  let selectedCustomerId = null;
+
+  // Function to render table from JSON data
+  function renderTable() {
+    const tbody = document.getElementById('customerTableBody');
+    tbody.innerHTML = '';
+
+    customersData.forEach(customer => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${customer.id}</td>
+        <td>${customer.first_name || ''}</td>
+        <td>${customer.last_name || ''}</td>
+        <td>${customer.email || ''}</td>
+        <td>${customer.contact_number || ''}</td>
+        <td>${customer.age || ''}</td>
+        <td>${customer.type || ''}</td>
+      `;
+
+      row.addEventListener('click', () => {
+        document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
+        row.classList.add('selected');
+        selectedRow = row;
+        selectedCustomerId = customer.id;
+      });
+
+      tbody.appendChild(row);
+    });
+  }
+
   document.getElementById('menuBtn').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
   });
@@ -286,7 +334,16 @@
     });
   });
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Fetch and populate customersData
+    const fetchedData = await fetchCustomers();
+    if (fetchedData && fetchedData.length > 0) {
+      customersData.push(...fetchedData);
+    }
+
+    // Render table from JSON
+    renderTable();
+
     const currentFile = window.location.pathname.split('/').pop() || 'Customer.html';
     document.querySelectorAll('.sidebar li').forEach(li => {
       const page = li.getAttribute('data-page');
@@ -297,99 +354,154 @@
       }
     });
 
-    document.querySelectorAll('tbody tr').forEach(row => {
-    row.addEventListener('click', () => {
-      document.querySelectorAll('tbody tr.selected').forEach(r => r.classList.remove('selected'));
-      row.classList.add('selected');
+    document.querySelector('.btn-add').addEventListener('click', () => {
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('formTitle').textContent = 'Add Customer';
+      editMode = false;
+
+      document.getElementById('firstName').value = '';
+      document.getElementById('lastName').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('contact').value = '';
+      document.getElementById('age').value = '';
+      document.getElementById('address').value = '';
+      document.getElementById('type').value = '';
+      document.getElementById('password').value = '';
     });
-  });
 
-  let selectedRow = null;
-  let editMode = false;
+    document.querySelector('.btn-edit').addEventListener('click', async () => {
+      if (!selectedCustomerId) {
+        alert('Please select a row first!');
+        return;
+      }
 
-  document.querySelectorAll('tbody tr').forEach(row => {
-    row.addEventListener('click', () => {
-      document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
-      row.classList.add('selected');
-      selectedRow = row;
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('formTitle').textContent = 'Edit Customer';
+      editMode = true;
+
+      // Fetch fresh data from API
+      try {
+        const response = await fetch(`http://localhost:3000/api/EditUsers/${selectedCustomerId}`);
+        if (!response.ok) {
+          alert('Error loading user data');
+          return;
+        }
+        const customer = await response.json();
+        
+        document.getElementById('firstName').value = customer.first_name || '';
+        document.getElementById('lastName').value = customer.last_name || '';
+        document.getElementById('email').value = customer.email || '';
+        document.getElementById('contact').value = customer.contact_number || '';
+        document.getElementById('age').value = customer.age || '';
+        document.getElementById('address').value = customer.address || '';
+        document.getElementById('type').value = customer.type || '';
+        document.getElementById('password').value = customer.password || '';
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        alert('Error loading user data');
+      }
     });
-  });
 
-  document.querySelector('.btn-add').addEventListener('click', () => {
-    document.getElementById('formContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = 'Add Customer';
-    editMode = false;
+    document.querySelector('.btn-delete').addEventListener('click', () => {
+      if (!selectedCustomerId) {
+        alert('Please select a row first!');
+        return;
+      }
 
-    document.getElementById('name').value = '';
-    document.getElementById('contact').value = '';
-    document.getElementById('address').value = '';
-  });
+      if (confirm('Are you sure you want to delete this customer?')) {
+        const index = customersData.findIndex(c => c.id === selectedCustomerId);
+        if (index > -1) {
+          customersData.splice(index, 1);
+          renderTable();
+          selectedRow = null;
+          selectedCustomerId = null;
+        }
+      }
+    });
 
-  document.querySelector('.btn-edit').addEventListener('click', () => {
-    if (!selectedRow) {
-      alert('Please select a row first!');
-      return;
-    }
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('email').value;
+      const contact = document.getElementById('contact').value;
+      const age = document.getElementById('age').value;
+      const address = document.getElementById('address').value;
+      const type = document.getElementById('type').value;
+      const password = document.getElementById('password').value;
 
-    document.getElementById('formContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = 'Edit Customer';
-    editMode = true;
+      if (editMode && selectedCustomerId) {
+        // Update existing customer via API
+        try {
+          const response = await fetch(`http://localhost:3000/api/EditUsers/${selectedCustomerId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              first_name: firstName,
+              last_name: lastName,
+              email: email,
+              contact_number: contact,
+              age: parseInt(age) || null,
+              address: address,
+              type: type,
+              password: password,
+            }),
+          });
 
-    document.getElementById('name').value = selectedRow.cells[1].textContent;
-    document.getElementById('contact').value = selectedRow.cells[2].textContent;
-    document.getElementById('address').value = selectedRow.cells[3].textContent;
-  });
+          const result = await response.json();
+          if (!response.ok) {
+            alert('Error updating user: ' + (result.error || 'Unknown error'));
+            return;
+          }
 
-  document.querySelector('.btn-delete').addEventListener('click', () => {
-    if (!selectedRow) {
-      alert('Please select a row first!');
-      return;
-    }
+          alert('User updated successfully');
+          // Update local data
+          const customer = customersData.find(c => c.id === selectedCustomerId);
+          if (customer) {
+            customer.first_name = firstName;
+            customer.last_name = lastName;
+            customer.email = email;
+            customer.contact_number = contact;
+            customer.age = age;
+            customer.address = address;
+            customer.type = type;
+            customer.password = password;
+          }
+        } catch (error) {
+          console.error('Error updating user:', error);
+          alert('Error updating user');
+          return;
+        }
+      } else {
+        // Add new customer
+        const newId = Math.max(...customersData.map(c => c.id), 0) + 1;
+        customersData.push({
+          id: newId,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          contact_number: contact,
+          age: parseInt(age) || null,
+          address: address,
+          type: type,
+          password: password,
+          creation_date: new Date().toISOString().split('T')[0],
+          latitude: null,
+          longitude: null
+        });
+        alert('User added successfully (local only)');
+      }
 
-    if (confirm('Are you sure you want to delete this customer?')) {
-      selectedRow.remove();
+      renderTable();
+      document.getElementById('formContainer').style.display = 'none';
       selectedRow = null;
-    }
-  });
+      selectedCustomerId = null;
+    });
 
-  document.getElementById('saveBtn').addEventListener('click', () => {
-    const name = document.getElementById('name').value;
-    const contact = document.getElementById('contact').value;
-    const address = document.getElementById('address').value;
-
-    const tbody = document.querySelector('tbody');
-
-    if (editMode && selectedRow) {
-  
-      selectedRow.cells[1].textContent = name;
-      selectedRow.cells[2].textContent = contact;
-      selectedRow.cells[3].textContent = address;
-    } else {
-      
-      const newRow = document.createElement('tr');
-
-      newRow.innerHTML = `
-        <td>${Math.floor(Math.random() * 1000)}</td>
-        <td>${name}</td>
-        <td>${contact}</td>
-        <td>${address}</td>
-      `;
-
-      newRow.addEventListener('click', () => {
-        document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
-        newRow.classList.add('selected');
-        selectedRow = newRow;
-      });
-
-      tbody.appendChild(newRow);
-    }
-
-    document.getElementById('formContainer').style.display = 'none';
-  });
-
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    document.getElementById('formContainer').style.display = 'none';
-  });
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.getElementById('formContainer').style.display = 'none';
+    });
   });
 </script>
 

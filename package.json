@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/Cantis10/HandyFix#readme",
   "dependencies": {
-    "@libsql/client": "^0.17.0",
+    "@libsql/client": "^0.17.2",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "nodemon": "^3.1.14",

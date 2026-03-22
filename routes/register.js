@@ -2,8 +2,6 @@ const express = require("express");
 const app = express.Router();
 const db = require("../routes/database");
 
-
-
 app.post("/register", async (req, res) => {
   console.log("test 1");
 

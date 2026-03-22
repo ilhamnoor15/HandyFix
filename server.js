@@ -14,9 +14,9 @@ const loginRouter = require("./routes/login");
 app.use("/api/", loginRouter);
 
 const registerRouter = require("./routes/register");
-app.use("/api/",registerRouter);
+app.use("/api/", registerRouter);
 
-const testRouter =require("./routes/test");
+const testRouter = require("./routes/test");
 app.use("/api/", testRouter);
 
 const userPagesRouter = require("./routes/pages/userPages");
@@ -31,7 +31,8 @@ app.use("/admin", adminPagesRouter);
 const contractPagesRouter = require("./routes/pages/contractPages");
 app.use("/contract", contractPagesRouter);
 
-
+const fetchUsersRouter = require("./routes/editUsers");
+app.use("/api/", fetchUsersRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
