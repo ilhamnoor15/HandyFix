@@ -474,23 +474,43 @@
           return;
         }
       } else {
-        // Add new customer
-        const newId = Math.max(...customersData.map(c => c.id), 0) + 1;
-        customersData.push({
-          id: newId,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          contact_number: contact,
-          age: parseInt(age) || null,
-          address: address,
-          type: type,
-          password: password,
-          creation_date: new Date().toISOString().split('T')[0],
-          latitude: null,
-          longitude: null
-        });
-        alert('User added successfully (local only)');
+        // Add new customer via API
+        try {
+          const response = await fetch('http://localhost:3000/api/AddUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              first_name: firstName,
+              last_name: lastName,
+              email: email,
+              contact_number: contact,
+              age: parseInt(age) || null,
+              address: address,
+              type: type,
+              password: password,
+            }),
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+            alert('Error adding user: ' + (result.error || 'Unknown error'));
+            return;
+          }
+
+          alert('User added successfully');
+          // Refresh the table data from server
+          const fetchedData = await fetchCustomers();
+          customersData.length = 0; // Clear existing data
+          if (fetchedData && fetchedData.length > 0) {
+            customersData.push(...fetchedData);
+          }
+        } catch (error) {
+          console.error('Error adding user:', error);
+          alert('Error adding user');
+          return;
+        }
       }
 
       renderTable();

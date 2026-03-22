@@ -87,4 +87,59 @@ app.put("/EditUsers/:id", async (req, res) => {
   }
 });
 
+app.post("/AddUser", async (req, res) => {
+  try {
+    const {
+      first_name,
+      last_name,
+      email,
+      password,
+      age,
+      contact_number,
+      address,
+      type,
+    } = req.body;
+
+    // Validate required fields
+    if (!first_name || !last_name || !email || !password || !type) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "Missing required fields: first_name, last_name, email, password, type",
+        });
+    }
+
+    // Insert new user (ID will be auto-incremented)
+    const result = await db.execute(
+      `INSERT INTO users (first_name, last_name, email, password, age, contact_number, address, type, creation_date) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        first_name,
+        last_name,
+        email,
+        password,
+        age || null,
+        contact_number || null,
+        address || null,
+        type,
+        new Date().toISOString().split("T")[0], // creation_date as YYYY-MM-DD
+      ],
+    );
+
+    res.json({
+      success: true,
+      message: "User added successfully",
+      userId: result.lastInsertRowid,
+    });
+  } catch (err) {
+    console.error(err);
+    // Handle unique constraint violation (email already exists)
+    if (err.message && err.message.includes("UNIQUE constraint failed")) {
+      return res.status(409).json({ error: "Email already exists" });
+    }
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = app;
