@@ -273,29 +273,17 @@
     <table>
       <thead>
         <tr>
-          <th>Contractor ID</th>
-          <th>Name</th>
-          <th>Service</th>
-          <th>Location</th>
-          <th>Status</th>
+          <th>ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Contact</th>
+          <th>Age</th>
+          <th>Type</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>201</td>
-          <td>Mark Santos</td>
-          <td>Plumbing</td>
-          <td>QC</td>
-          <td><span class="status-available">Available</span></td>
-        </tr>
-        <tr>
-          <td>202</td>
-          <td>Leo Cruz</td>
-          <td>Electrical</td>
-          <td>QC</td>
-          <td><span class="status-busy">Busy</span></td>
-        </tr>
-  
+      <tbody id="contractorTableBody">
+        
       </tbody>
     </table>
   </div>
@@ -309,17 +297,19 @@
   <div id="formContainer">
     <h3 id="formTitle">Add Contractor</h3>
 
-    <input type="text" id="name" placeholder="Name">
-    <input type="text" id="service" placeholder="Service">
-    <input type="text" id="location" placeholder="Location">
-
-    <select id="status">
-      <option value="Available">Available</option>
-      <option value="Busy">Busy</option>
+    <input type="text" id="firstName" placeholder="First Name">
+    <input type="text" id="lastName" placeholder="Last Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="text" id="contact" placeholder="Contact Number">
+    <input type="number" id="age" placeholder="Age">
+    <input type="text" id="address" placeholder="Address">
+    <select id="type">
+      <option value="contractor">Contractor</option>
     </select>
+    <input type="text" id="password" placeholder="Password">
 
     <br><br>
-    
+
     <button id="saveBtn" class="btn btn-add">Save Changes</button>
     <button id="cancelBtn" class="btn btn-delete">Cancel</button>
   </div>
@@ -327,6 +317,53 @@
 </main>
 
 <script>
+  // Contractor data in JSON format
+
+  async function fetchContractors() {
+    try {
+      const response = await fetch('http://localhost:3000/api/AllContractorUsers');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching contractors:', error);
+      return [];
+    }
+  }
+
+  let contractorsData = [];
+
+  let selectedRow = null;
+  let editMode = false;
+  let selectedContractorId = null;
+
+  // Function to render table from JSON data
+  function renderTable() {
+    const tbody = document.getElementById('contractorTableBody');
+    tbody.innerHTML = '';
+
+    contractorsData.forEach(contractor => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${contractor.id}</td>
+        <td>${contractor.first_name || ''}</td>
+        <td>${contractor.last_name || ''}</td>
+        <td>${contractor.email || ''}</td>
+        <td>${contractor.contact_number || ''}</td>
+        <td>${contractor.age || ''}</td>
+        <td>${contractor.type || ''}</td>
+      `;
+
+      row.addEventListener('click', () => {
+        document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
+        row.classList.add('selected');
+        selectedRow = row;
+        selectedContractorId = contractor.id;
+      });
+
+      tbody.appendChild(row);
+    });
+  }
+
   document.getElementById('menuBtn').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
   });
@@ -340,7 +377,16 @@
     });
   });
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Fetch and populate contractorsData
+    const fetchedData = await fetchContractors();
+    if (fetchedData && fetchedData.length > 0) {
+      contractorsData.push(...fetchedData);
+    }
+
+    // Render table from JSON
+    renderTable();
+
     const currentFile = window.location.pathname.split('/').pop() || 'Contractor.html';
     document.querySelectorAll('.sidebar li').forEach(li => {
       const page = li.getAttribute('data-page');
@@ -351,111 +397,174 @@
       }
     });
 
-  document.querySelectorAll('tbody tr').forEach(row => {
-    row.addEventListener('click', () => {
-      document.querySelectorAll('tbody tr.selected').forEach(r => r.classList.remove('selected'));
-      row.classList.add('selected');
+    document.querySelector('.btn-add').addEventListener('click', () => {
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('formTitle').textContent = 'Add Contractor';
+      editMode = false;
+
+      document.getElementById('firstName').value = '';
+      document.getElementById('lastName').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('contact').value = '';
+      document.getElementById('age').value = '';
+      document.getElementById('address').value = '';
+      document.getElementById('type').value = 'contractor';
+      document.getElementById('password').value = '';
     });
-  });
 
-  let selectedRow = null;
-  let editMode = false;
+    document.querySelector('.btn-edit').addEventListener('click', async () => {
+      if (!selectedContractorId) {
+        alert('Please select a row first!');
+        return;
+      }
 
-  document.querySelectorAll('tbody tr').forEach(row => {
-    row.addEventListener('click', () => {
-      document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
-      row.classList.add('selected');
-      selectedRow = row;
+      document.getElementById('formContainer').style.display = 'block';
+      document.getElementById('formTitle').textContent = 'Edit Contractor';
+      editMode = true;
+
+      // Fetch fresh data from API
+      try {
+        const response = await fetch(`http://localhost:3000/api/fetchUser/${selectedContractorId}`);
+        if (!response.ok) {
+          alert('Error loading user data');
+          return;
+        }
+        const contractor = await response.json();
+        
+        document.getElementById('firstName').value = contractor.first_name || '';
+        document.getElementById('lastName').value = contractor.last_name || '';
+        document.getElementById('email').value = contractor.email || '';
+        document.getElementById('contact').value = contractor.contact_number || '';
+        document.getElementById('age').value = contractor.age || '';
+        document.getElementById('address').value = contractor.address || '';
+        document.getElementById('type').value = contractor.type || '';
+        document.getElementById('password').value = contractor.password || '';
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        alert('Error loading user data');
+      }
     });
-  });
 
-  document.querySelector('.btn-add').addEventListener('click', () => {
-    document.getElementById('formContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = 'Add Contractor';
-    editMode = false;
+    document.querySelector('.btn-delete').addEventListener('click', () => {
+      if (!selectedContractorId) {
+        alert('Please select a row first!');
+        return;
+      }
 
-    document.getElementById('name').value = '';
-    document.getElementById('service').value = '';
-    document.getElementById('location').value = '';
-    document.getElementById('status').value = 'Available';
-  });
+      if (confirm('Are you sure you want to delete this contractor?')) {
+        const index = contractorsData.findIndex(c => c.id === selectedContractorId);
+        if (index > -1) {
+          contractorsData.splice(index, 1);
+          renderTable();
+          selectedRow = null;
+          selectedContractorId = null;
+        }
+      }
+    });
 
-  document.querySelector('.btn-edit').addEventListener('click', () => {
-    if (!selectedRow) {
-      alert('Please select a row first!');
-      return;
-    }
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('email').value;
+      const contact = document.getElementById('contact').value;
+      const age = document.getElementById('age').value;
+      const address = document.getElementById('address').value;
+      const type = document.getElementById('type').value;
+      const password = document.getElementById('password').value;
 
-    document.getElementById('formContainer').style.display = 'block';
-    document.getElementById('formTitle').textContent = 'Edit Contractor';
-    editMode = true;
+      if (editMode && selectedContractorId) {
+        // Update existing contractor via API
+        try {
+          const response = await fetch(`http://localhost:3000/api/EditUsers/${selectedContractorId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              first_name: firstName,
+              last_name: lastName,
+              email: email,
+              contact_number: contact,
+              age: parseInt(age) || null,
+              address: address,
+              type: type,
+              password: password,
+            }),
+          });
 
-    document.getElementById('name').value = selectedRow.cells[1].textContent;
-    document.getElementById('service').value = selectedRow.cells[2].textContent;
-    document.getElementById('location').value = selectedRow.cells[3].textContent;
-    document.getElementById('status').value =
-      selectedRow.cells[4].textContent.trim();
-  });
+          const result = await response.json();
+          if (!response.ok) {
+            alert('Error updating user: ' + (result.error || 'Unknown error'));
+            return;
+          }
 
-  document.querySelector('.btn-delete').addEventListener('click', () => {
-    if (!selectedRow) {
-      alert('Please select a row first!');
-      return;
-    }
+          alert('User updated successfully');
+          // Update local data
+          const contractor = contractorsData.find(c => c.id === selectedContractorId);
+          if (contractor) {
+            contractor.first_name = firstName;
+            contractor.last_name = lastName;
+            contractor.email = email;
+            contractor.contact_number = contact;
+            contractor.age = age;
+            contractor.address = address;
+            contractor.type = type;
+            contractor.password = password;
+          }
+        } catch (error) {
+          console.error('Error updating user:', error);
+          alert('Error updating user');
+          return;
+        }
+      } else {
+        // Add new contractor via API
+        try {
+          const response = await fetch('http://localhost:3000/api/AddUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              first_name: firstName,
+              last_name: lastName,
+              email: email,
+              contact_number: contact,
+              age: parseInt(age) || null,
+              address: address,
+              type: type,
+              password: password,
+            }),
+          });
 
-    const confirmDelete = confirm('Are you sure you want to delete this contractor?');
+          const result = await response.json();
+          if (!response.ok) {
+            alert('Error adding user: ' + (result.error || 'Unknown error'));
+            return;
+          }
 
-    if (confirmDelete) {
-      selectedRow.remove();
+          alert('User added successfully');
+          // Refresh the table data from server
+          const fetchedData = await fetchContractors();
+          contractorsData.length = 0; // Clear existing data
+          if (fetchedData && fetchedData.length > 0) {
+            contractorsData.push(...fetchedData);
+          }
+        } catch (error) {
+          console.error('Error adding user:', error);
+          alert('Error adding user');
+          return;
+        }
+      }
+
+      renderTable();
+      document.getElementById('formContainer').style.display = 'none';
       selectedRow = null;
-    }
-  });
+      selectedContractorId = null;
+    });
 
-  document.getElementById('saveBtn').addEventListener('click', () => {
-    const name = document.getElementById('name').value;
-    const service = document.getElementById('service').value;
-    const location = document.getElementById('location').value;
-    const status = document.getElementById('status').value;
-
-    const tbody = document.querySelector('tbody');
-
-    if (editMode && selectedRow) {
-      selectedRow.cells[1].textContent = name;
-      selectedRow.cells[2].textContent = service;
-      selectedRow.cells[3].textContent = location;
-      selectedRow.cells[4].innerHTML =
-        status === 'Available'
-          ? '<span class="status-available">Available</span>'
-          : '<span class="status-busy">Busy</span>';
-    } else {
-      const newRow = document.createElement('tr');
-
-      newRow.innerHTML = `
-        <td>${Math.floor(Math.random() * 1000)}</td>
-        <td>${name}</td>
-        <td>${service}</td>
-        <td>${location}</td>
-        <td>${status === 'Available'
-          ? '<span class="status-available">Available</span>'
-          : '<span class="status-busy">Busy</span>'}
-        </td>
-      `;
-
-      newRow.addEventListener('click', () => {
-        document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
-        newRow.classList.add('selected');
-        selectedRow = newRow;
-      });
-
-      tbody.appendChild(newRow);
-    }
-
-    document.getElementById('formContainer').style.display = 'none';
-  });
-
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    document.getElementById('formContainer').style.display = 'none';
-  });
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.getElementById('formContainer').style.display = 'none';
+    });
   });
 </script>
 

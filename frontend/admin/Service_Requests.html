@@ -251,7 +251,35 @@
 <main class="main">
   <h1>Customer Requests</h1>
 
-  <section class="add-ticket-section">
+
+
+  <div class="table-wrapper">
+    <table id="requestsTable">
+      <thead>
+        <tr>
+          <th>Request ID</th>
+          <th>Customer</th>
+          <th>Service</th>
+          <th>Sub Service</th>
+          <th>Location</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="requestsTbody"></tbody>
+    </table>
+  </div>
+  
+  <div class="actions">
+    <button class="assign-btn" id="addTicketToggleBtn">Add New Ticket</button>
+    <button class="assign-btn" id="assignBtn" disabled>
+      Assign Contractor
+    </button>
+    <button class="assign-btn" id="cycleStateBtn" disabled>
+      Cycle State
+    </button>
+  </div>
+
+    <section class="add-ticket-section" id="addTicketSection" style="display: none;">
     <h2>Add New Ticket</h2>
     <form id="addTicketForm">
       <div class="form-row">
@@ -287,28 +315,6 @@
       <span id="addTicketMessage" style="margin-left:1rem; color: var(--maroon);"></span>
     </form>
   </section>
-
-  <div class="table-wrapper">
-    <table id="requestsTable">
-      <thead>
-        <tr>
-          <th>Request ID</th>
-          <th>Customer</th>
-          <th>Service</th>
-          <th>Sub Service</th>
-          <th>Location</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="requestsTbody"></tbody>
-    </table>
-  </div>
-  
-  <div class="actions">
-    <button class="assign-btn" id="assignBtn" disabled>
-      Assign Contractor
-    </button>
-  </div>
   </main>
 
   <script>
@@ -328,6 +334,7 @@
   const table = document.getElementById('requestsTable');
   const tbody = document.getElementById('requestsTbody');
   const assignBtn = document.getElementById('assignBtn');
+  const cycleStateBtn = document.getElementById('cycleStateBtn');
   let selectedRequestId = null;
 
   async function fetchRequests() {
@@ -349,6 +356,7 @@
       tbody.innerHTML = '<tr><td colspan="6">No service requests available</td></tr>';
       assignBtn.disabled = true;
       assignBtn.textContent = 'Assign Contractor';
+      cycleStateBtn.disabled = true;
       selectedRequestId = null;
       return;
     }
@@ -370,6 +378,7 @@
     selectedRequestId = null;
     assignBtn.disabled = true;
     assignBtn.textContent = 'Assign Contractor';
+    cycleStateBtn.disabled = true;
   }
 
   const addTicketForm = document.getElementById('addTicketForm');
@@ -421,6 +430,7 @@
     selectedRequestId = row.getAttribute('data-id');
     assignBtn.disabled = false;
     assignBtn.textContent = `Assign Contractor (ID: ${selectedRequestId})`;
+    cycleStateBtn.disabled = false;
   });
 
   assignBtn.addEventListener('click', async function() {
@@ -446,6 +456,39 @@
     } else {
       alert('Please select a request first.');
     }
+  });
+
+  cycleStateBtn.addEventListener('click', async function() {
+    if (!this.disabled && selectedRequestId) {
+      const selectedRow = tbody.querySelector('tr.selected');
+      const currentState = selectedRow.querySelector('td:last-child').textContent.trim();
+      const states = ['open', 'assigned', 'closed'];
+      let currentIndex = states.indexOf(currentState);
+      if (currentIndex === -1) currentIndex = 0;
+      const nextState = states[(currentIndex + 1) % states.length];
+      try {
+        const response = await fetch(`/api/EditTickets/${selectedRequestId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ state: nextState }),
+        });
+        if (!response.ok) {
+          const payload = await response.json();
+          throw new Error(payload.error || 'Failed to update ticket state');
+        }
+        await fetchRequests();
+      } catch (error) {
+        console.error(error);
+        alert('Could not update ticket state. Check console for details.');
+      }
+    } else {
+      alert('Please select a request first.');
+    }
+  });
+
+  document.getElementById('addTicketToggleBtn').addEventListener('click', () => {
+    const section = document.getElementById('addTicketSection');
+    section.style.display = section.style.display === 'none' ? 'block' : 'none';
   });
 
   document.addEventListener('DOMContentLoaded', () => {

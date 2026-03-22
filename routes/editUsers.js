@@ -13,6 +13,30 @@ app.get("/AllUsers", async (req, res) => {
   }
 });
 
+app.get("/AllCustomerUsers", async (req, res) => {
+  try {
+    const result = await db.execute("SELECT * FROM users WHERE type = 'user'");
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/AllContractorUsers", async (req, res) => {
+  try {
+    const result = await db.execute(
+      "SELECT * FROM users WHERE type = 'contractor'",
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.get("/fetchUser/:id", async (req, res) => {
   console.log(req.params.id);
   try {

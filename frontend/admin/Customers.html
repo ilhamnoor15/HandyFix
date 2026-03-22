@@ -276,9 +276,10 @@
 <script>
   // Customer data in JSON format
 
+
   async function fetchCustomers() {
     try {
-      const response = await fetch('http://localhost:3000/api/AllUsers');
+      const response = await fetch('http://localhost:3000/api/AllCustomerUsers');
       const data = await response.json();
       return data;
     } catch (error) {
