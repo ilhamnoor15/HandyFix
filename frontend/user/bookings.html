@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandyFix | Plumbing Services</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 p-0 text-white min-vh-100 shadow d-flex flex-column justify-content-between" style="background-color: #4A0E0E; position: fixed;">
+            <div>
+                <div class="p-4 text-center">
+                    <h4 class="fw-bold m-0">LOGO</h4>
+                    <small style="color: #E5A832; letter-spacing: 2px; font-weight: bold;">HandyFix</small>
+                </div>
+
+                <ul class="nav flex-column mt-4 ps-3">
+                    <li class="nav-item mb-2">
+                        <a href="home.html" id="dashboardLink" class="nav-link text-white opacity-75 fw-bold">
+                            <i class="bi bi-house-door-fill me-2"></i>Home</a>
+                    </li>
+
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white opacity-75 fw-bold d-flex align-items-center" 
+                        id="servicesToggle"
+                        data-bs-toggle="collapse" 
+                        href="#servicesSubmenu" 
+                        role="button">
+                            <i class="bi bi-list-ul me-2"></i> 
+                            <span>Services</span>
+                        </a>
+                        
+                        <div class="collapse" id="servicesSubmenu">
+                        <ul class="nav flex-column ms-4 mt-2 mb-2 border-start border-secondary">
+                                <li class="nav-item">
+                                    <a href="plumbing.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-droplet-fill me-2"></i> Plumbing Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-house-check-fill me-2"></i>Home Maintenance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="electrical.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-lightning-charge-fill me-2"></i>Electrical Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="carpentry.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-tools me-2"></i>Carpentry Services</a>
+                                <li class="nav-item">
+                                    <a href="tool.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-briefcase-fill me-2"></i>Tool Services</a>                                
+                                </li>
+                            </ul>
+                        </li>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="bookings.html" class="nav-link active-link text-white opacity-75 fw-bold"><i class="bi bi-calendar-check me-2"></i> My Bookings</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="messages.html" class="nav-link text-white opacity-75 fw-bold"><i class="bi bi-chat-dots me-2"></i> Messages</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="profile.html" class="nav-link text-white opacity-75 fw-bold"><i class="bi bi-person-circle me-2"></i> Profile</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="support.html" class="nav-link text-white opacity-75 fw-bold"><i class="bi bi-question-circle me-2"></i> Help & Support</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="settings.html" class="nav-link text-white opacity-75 fw-bold small"><i class="bi bi-gear me-2"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="login.html" class="nav-link text-white opacity-75 fw-bold small"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+                    <main class="col-md-10 ms-auto p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold" style="color: #4A0E0E;">My Bookings</h2>
+                        </div>
+
+                        <ul class="nav nav-pills mb-4 gap-2" id="pills-tab" role="tablet">
+                            <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill px-4 fw-bold text-secondary-emphasis" 
+                                    id="pills-upcoming-tab" 
+                                    data-bs-toggle="pill"
+                                    data-bs-target="#pills-upcoming"
+                                    type="button"
+                                    role="tab">Upcoming</button>                            
+                            </li>
+                            <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-4 fw-bold text-secondary-emphasis" 
+                                    id="pills-pending-tab" 
+                                    data-bs-toggle="pill" 
+                                    data-bs-target="#pills-pending" 
+                                    type="button"
+                                    role="tab">Pending</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-4 fw-bold text-secondary-emphasis"
+                                    id="pills-completed-tab" 
+                                    data-bs-toggle="pill" 
+                                    data-bs-target="#pills-completed" 
+                                    type="button" 
+                                    role="tab">Completed</button>
+                                </li> 
+                            </li>
+                            <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill px-4 fw-bold text-secondary-emphasis"
+                                    id="pills-cancelled-tab" 
+                                    data-bs-toggle="pill" 
+                                    data-bs-target="#pills-cancelled" 
+                                    type="button" 
+                                    role="tab">Cancelled</button>
+                            </li>
+                        </ul>
+
+
+
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-upcoming" role="tabpanel">
+                        <div class="card border-0 shadow-sm rounded-4 p-3 mb-3">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <div class="bg-light p-3 rounded-4">
+                                        <i class="bi bi-droplet-fill text-primary fs-3"></i>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="col">
+                                    <h5 class="fw-bold mb-1">Leak Repair (Plumbing)</h5>
+                                    <p class="text-muted mb-0 small"><i class="bi bi-calendar3 me-2"></i>March 27, 2026 | 10:00 AM</p>
+                                    <p class="text-muted mb-0 small"><i class="bi bi-person me-2"></i>Technician: Juan Dela Cruz</p>
+                                </div>
+                                <div class="col-auto d-flex flex-column align-items-end justify-content-center">
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 mb-2 w-100">Confirmed</span>
+                                    
+                                    <button class="btn btn-sm rounded-pill px-4 fw-bold text-white shadow-sm" 
+                                            style="background-color: #a23a3a; border: none; font-size: 0.8rem; transition: 0.3s;">
+                                        View Details
+                                    </button>                                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+<div class="tab-pane fade" id="pills-pending" role="tabpanel">
+    <div class="card border-0 shadow-sm rounded-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 250px; background-color: #ffffff;">
+        <div class="text-center py-5">
+            <i class="bi bi-clock-history mb-3" style="font-size: 3.5rem; color: #6c757d; opacity: 0.5;"></i>
+            <h5 class="fw-bold text-dark mb-1">No pending history yet</h5>
+            <p class="text-muted small">Check back later for your new service requests.</p>
+        </div>
+    </div>
+</div>
+
+<div class="tab-pane fade" id="pills-completed" role="tabpanel">
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-3">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="bg-light p-3 rounded-4">
+                    <i class="bi bi-lightning-charge-fill text-warning fs-3"></i>
+                </div>
+            </div>
+            <div class="col">
+                <h5 class="fw-bold mb-1">Outlet & Switch Repair (Electrical)</h5>
+                <p class="text-muted mb-0 small"><i class="bi bi-calendar3 me-2"></i>March 19, 2026 | 2:37 PM</p>
+                <p class="text-muted mb-0 small"><i class="bi bi-person me-2"></i>Technician: Alden Ash</p>
+            </div>
+            <div class="col-auto d-flex flex-column align-items-end justify-content-center">
+                <span class="badge rounded-pill px-3 py-2 mb-2 w-100" 
+                      style="background-color: #198754; color: white;">Completed</span>
+                
+                <button class="btn btn-sm rounded-pill px-4 fw-bold text-white shadow-sm" 
+                        style="background-color: #a23a3a; border: none; font-size: 0.8rem;">
+                    View Details
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-pane fade" id="pills-cancelled" role="tabpanel">
+    <div class="card border-0 shadow-sm rounded-4 d-flex flex-column align-items-center justify-content-center" style="min-height: 250px; background-color: #ffffff;">
+        <div class="text-center py-5">
+            <i class="bi bi-x-circle mb-3" style="font-size: 3.5rem; color: #dc3545; opacity: 0.5;"></i>
+            <h5 class="fw-bold text-dark mb-1">No cancelled bookings</h5>
+            <p class="text-muted small">You don't have any cancelled service requests at the moment.</p>
+        </div>
+    </div>
+</div>
+
+    </div> 
+</main>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const dashboardLink = document.getElementById('dashboardLink');
+
+    servicesToggle.addEventListener('click', function() {
+        dashboardLink.classList.remove('active-link');
+        dashboardLink.classList.add('opacity-75');
+
+        this.classList.add('clicked-service');
+        this.classList.remove('opacity-75');
+    });
+
+
+
+
+const navLinks = document.querySelectorAll('.nav-link');
+
+navLinks.forEach(link => {
+    link.addEventListener('click', function() {
+        document.querySelector('.nav-link.active').classList.remove('active');
+        
+        this.classList.add('active');
+    });
+});
+
+
+</script>
+
+
+</body>
+</html>
