@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandyFix | Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 p-0 text-white min-vh-100 shadow d-flex flex-column justify-content-between" style="background-color: #4A0E0E; position: fixed;">
+            <div>
+                <div class="p-4 text-center">
+                    <h4 class="fw-bold m-0">LOGO</h4>
+                    <small style="color: #E5A832; letter-spacing: 2px; font-weight: bold;">HandyFix</small>
+                </div>
+
+                <ul class="nav flex-column mt-4 ps-3">
+                    <li class="nav-item mb-2">
+                        <a href="home.html" id="dashboardLink" class="nav-link text-white opacity-75 fw-bold">
+                            <i class="bi bi-house-door-fill me-2"></i>Home</a>
+                    </li>
+
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white opacity-75 fw-bold d-flex align-items-center" 
+                        id="servicesToggle"
+                        data-bs-toggle="collapse" 
+                        href="#servicesSubmenu" 
+                        role="button">
+                            <i class="bi bi-list-ul me-2"></i> 
+                            <span>Services</span>
+                        </a>
+                        
+                        <div class="collapse" id="servicesSubmenu">
+                        <ul class="nav flex-column ms-4 mt-2 mb-2 border-start border-secondary">
+                                <li class="nav-item">
+                                    <a href="plumbing.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-droplet-fill me-2"></i> Plumbing Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-house-check-fill me-2"></i>Home Maintenance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="electrical.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-lightning-charge-fill me-2"></i>Electrical Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="carpentry.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-tools me-2"></i>Carpentry Services</a>
+                                <li class="nav-item">
+                                    <a href="tool.html" class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-briefcase-fill me-2"></i>Tool Services</a>                                
+                                </li>
+                            </ul>
+                        </li>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="bookings.html" class="nav-link text-white opacity-75 fw-bold"><i class="bi bi-calendar-check me-2"></i> My Bookings</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="messages.html" class="nav-link active-link text-white opacity-75 fw-bold"><i class="bi bi-chat-dots me-2"></i> Messages</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="profile.html" class="nav-link text-white opacity-75 fw-bold"><i class="bi bi-person-circle me-2"></i> Profile</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="support.html" class="nav-link text-white opacity-75 fw-bold"><i class="bi bi-question-circle me-2"></i> Help & Support</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="settings.html" class="nav-link text-white opacity-75 fw-bold small"><i class="bi bi-gear me-2"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="login.html" class="nav-link text-white opacity-75 fw-bold small"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+<main class="col-md-10 ms-auto p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-4" style="color: #4A0E0E;">Messages</h2>
+    </div>
+
+
+        <div class="container-fluid vh-100 bg-white p-0">
+            
+    <div class="row g-0 h-100">
+
+<div class="col-md-4 col-lg-3 border-end d-flex flex-column bg-white p-0">
+    
+    <div class="search-header-area border-bottom">
+        <div class="search-container position-relative">
+            <i class="bi bi-search search-icon-maroon"></i>                    
+            <input type="text" id="techSearch" class="form-control search-input shadow-none" 
+                   placeholder="Search technician..." onkeyup="filterTechnicians()">
+        </div>
+    </div>
+    
+    <div class="flex-grow-1 overflow-auto px-2 mt-2" id="technicianList">
+    <div class="tech-card d-flex align-items-center p-3 mb-2 active-chat" onclick="openChat('John Doe', 'Active Now', 'JD')" data-name="John Doe">
+        <div class="avatar-circle">JD</div>
+        <div class="ms-3 flex-grow-1">
+            <h6 class="mb-0 fw-bold">John Doe</h6>
+            <small class="text-muted text-truncate d-block" id="preview-John-Doe">That’s a clogged...</small>
+        </div>
+    </div>
+
+<div class="tech-card d-flex align-items-center p-3 mb-2" onclick="openChat('Alden Ash', 'Active Now', 'AA')" data-name="Alden Ash">
+        <div class="avatar-circle" style="background-color: #2c3e50;">AA</div>
+        <div class="ms-3 flex-grow-1">
+            <h6 class="mb-0 fw-bold">Alden Ash</h6>
+            <small class="text-muted text-truncate d-block" id="preview-Alden-Ash">Noted. I’ll ensure...</small>
+        </div>
+    </div>
+
+<div class="tech-card d-flex align-items-center p-3 mb-2" onclick="openChat('Juan Dela Cruz', 'Active 5m ago', 'JC')" data-name="Juan Dela Cruz">
+        <div class="avatar-circle" style="background-color: #16a085;">JC</div>
+        <div class="ms-3 flex-grow-1">
+            <h6 class="mb-0 fw-bold">Juan Dela Cruz</h6>
+            <small class="text-muted text-truncate d-block" id="preview-Juan-Dela-Cruz">I need to check the...</small>
+        </div>
+    </div>
+
+<div class="tech-card d-flex align-items-center p-3 mb-2" onclick="openChat('Ana Santos', 'Active Now', 'AS')" data-name="Ana Santos">
+        <div class="avatar-circle" style="background-color: #8e44ad;">AS</div>
+        <div class="ms-3 flex-grow-1">
+            <h6 class="mb-0 fw-bold">Ana Santos</h6>
+            <small class="text-muted text-truncate d-block" id="preview-Ana-Santos">Good thing you no...</small>
+        </div>
+    </div>
+            </div>
+        </div>
+
+
+
+
+<div class="col-md-8 col-lg-9 d-flex flex-column" style="background-color: #fdfdfd; height: calc(100vh - 80px);">    
+    <div class="p-3 border-bottom bg-white d-flex align-items-center">
+                <div id="chat-avatar" class="avatar-small">JD</div>
+                <div class="ms-3">
+                    <h6 id="chat-name" class="mb-0 fw-bold">John Doe</h6>
+                    <small id="chat-status" class="text-muted">Plumbing Expert</small>
+                </div>
+            </div>
+
+            
+
+            <div class="flex-grow-1 p-4 overflow-auto d-flex flex-column" id="chat-messages">
+                <div class="message-bubble received">Hi! I have a problem with my sink.</div>
+                <div class="message-bubble sent">Hello! John Doe here. I can visit at 2 PM.</div>
+            </div>
+
+            <div class="p-3 bg-transparent border-top">
+                <div class="p-0 bg-transparent border-0 d-flex align-items-center justify-content-center" style="gap: 10px; width: 100%; margin-bottom: 20px; padding: 0 15px;">                
+                    <div class="input-wrapper flex-grow-1" style="max-width: 900px;">
+                    <input type="text" 
+                            id="messageInput" 
+                            class="form-control border-0 shadow-none px-4 bg-transparent" 
+                            placeholder="Type a message..."
+                            oninput="updatePreview(this.value)">
+                </div>
+
+                    <button id="sendBtn" class="btn-send-rectangular">Send</button>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</main>
+
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+function getActiveTechName() {
+    const activeCard = document.querySelector('.tech-card.active-chat');
+    if (activeCard) {
+        return activeCard.querySelector('h6').innerText.trim();
+    }
+    return "John Doe"; 
+}
+
+function openChat(name, status, initial) {
+    document.querySelectorAll('.tech-card').forEach(card => {
+        card.classList.remove('active-chat');
+        if(card.innerText.includes(name)) {
+            card.classList.add('active-chat');
+        }
+    });
+
+    const headerName = document.querySelector('.chat-header h6') || document.querySelector('.chat-header-name');
+    if (headerName) headerName.innerText = name;
+
+    const headerAvatar = document.querySelector('.chat-header .avatar-circle');
+    if (headerAvatar) headerAvatar.innerText = initial;
+
+    document.getElementById('messageInput').value = "";
+}
+
+function updatePreview(val) {
+    const currentName = getActiveTechName();
+    let targetID = "preview-" + currentName.replace(/\s+/g, '-');
+    let previewElement = document.getElementById(targetID);
+
+    if (previewElement) {
+        if (val.trim() === "") {
+            previewElement.style.fontStyle = "normal";
+            previewElement.style.color = "#6c757d";
+        } else {
+            previewElement.innerText = val;
+            previewElement.style.color = "#800000"; 
+
+        }
+    }
+}
+
+
+    const servicesToggle = document.getElementById('servicesToggle');
+    const dashboardLink = document.getElementById('dashboardLink');
+
+    servicesToggle.addEventListener('click', function() {
+        dashboardLink.classList.remove('active-link');
+        dashboardLink.classList.add('opacity-75');
+
+        this.classList.add('clicked-service');
+        this.classList.remove('opacity-75');
+    });
+
+
+const conversations = {
+        'John Doe': [
+            { type: 'sent', text: 'Hey John, my aircon isn’t cooling properly anymore.'},
+            { type: 'received', text: 'It might need a deep cleaning or a freon recharge.' },
+            { type: 'sent', text: 'It’s also leaking water inside the room.' },
+            { type: 'received', text: 'That’s a clogged drainage. I’ll be there by 4 PM to fix it.' }
+        ],
+        'Alden Ash': [
+            { type: 'sent', text: 'Hi Alden, I noticed some flickering lights in the kitchen. Can you check it?'},
+            { type: 'received', text: 'Good morning! Yes, that sounds like a loose connection. I can check it later.' },
+            { type: 'sent', text: 'Great. Please check the outlets as well just to be safe.' },
+            { type: 'received', text: 'Noted. I’ll ensure all the wiring is now okay before I leave.' }
+        ],
+        'Juan Dela Cruz': [
+            { type: 'sent', text: 'Hi, I have a problem with my sink.'},
+            { type: 'received', text: 'Hello! John Doe here. I can visit at 2 PM to fix your sink.' },
+            { type: 'sent', text: 'Hi John, that would be great. How much is the estimate?' },
+            { type: 'received', text: 'I need to check the pipes first, but standard labor is around 500 pesos.' }
+        ],
+        'Ana Santos': [
+            { type: 'sent', text: 'Hi Ana, are you available to check some grounded outlets in my room?'},
+            { type: 'received', text: 'Hello! Yes, I can drop by. Is the circuit breaker tripping when you use them?' },
+            { type: 'sent', text: 'Yes, it happened twice this morning. I’m worried it might cause a short circuit.' },
+            { type: 'received', text: 'Good thing you noticed. Please avoid using those outlets for now. I’ll be there in an hour.' }
+        ],
+    };
+
+    function openChat(name, status, initials) {
+    document.getElementById('chat-name').innerText = name;
+    document.getElementById('chat-avatar').innerText = initials;
+
+    const statusElement = document.getElementById('chat-status');
+    if (status === 'Active Now') {
+        statusElement.innerHTML = `<span class="status-dot"></span>Active Now`;
+    } else {
+        statusElement.innerText = status;
+    }
+
+    const chatWindow = document.getElementById('chat-messages');
+    chatWindow.innerHTML = ''; 
+
+if (conversations[name]) {
+    conversations[name].forEach(msg => {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${msg.type}`;
+
+        const label = document.createElement('div');
+        label.className = 'chat-label';
+        label.innerText = (msg.type === 'sent') ? 'Customer' : 'Technician';
+
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble-box ${msg.type}`;
+        bubble.innerText = msg.text;
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        chatWindow.appendChild(wrapper);
+    });
+}
+
+
+    const cards = document.getElementsByClassName('tech-card');
+    for (let card of cards) {
+        card.classList.remove('active-chat');
+        if (card.getAttribute('data-name') === name) {
+            card.classList.add('active-chat');
+        }
+    }
+
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+
+window.onload = () => openChat('John Doe', 'Active Now', 'JD');
+
+
+
+function filterTechnicians() {
+    const input = document.getElementById('techSearch').value.toLowerCase();
+    
+    const cards = document.getElementsByClassName('tech-card');
+
+    for (let i = 0; i < cards.length; i++) {
+        const name = cards[i].querySelector('h6').innerText.toLowerCase();
+
+        if (name.startsWith(input)) {
+            cards[i].style.setProperty('display', 'flex', 'important'); // Ipakita
+        } else {
+            cards[i].style.setProperty('display', 'none', 'important'); // Itago
+        }
+    }
+}
+
+const chatWindow = document.getElementById('chat-messages');
+chatWindow.innerHTML = ''; 
+
+if (conversations[name]) {
+    conversations[name].forEach(msg => {
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${msg.type}`;
+
+        const label = document.createElement('div');
+        label.className = 'chat-label';
+        label.innerText = (msg.type === 'sent') ? 'Customer' : 'Technician';
+
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble-box ${msg.type}`;
+        bubble.innerText = msg.text;
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        
+        chatWindow.appendChild(wrapper);
+    });
+}
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message-wrapper received'; 
+
+        const label = document.createElement('div');
+        label.className = 'chat-role-label';
+        label.innerText = 'Admin'; 
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble-box';
+        bubble.innerText = 'Hello Maria, may I ask why you want to cancel?';
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        chatWindow.appendChild(wrapper);
+
+
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const messageText = input.value.trim();
+    const currentName = document.getElementById('chat-name').innerText; 
+
+    if (messageText !== "") {
+        if (!conversations[currentName]) {
+            conversations[currentName] = [];
+        }
+        conversations[currentName].push({ type: 'sent', text: messageText });
+
+        const currentInitials = document.getElementById('chat-avatar').innerText;
+        const currentStatus = document.getElementById('chat-status').innerText;
+        
+        openChat(currentName, currentStatus, currentInitials);
+
+        input.value = "";
+    }
+}
+
+document.getElementById('sendBtn').addEventListener('click', sendMessage);
+
+document.getElementById('messageInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+
+</script>
+
+</body>
+</html>
