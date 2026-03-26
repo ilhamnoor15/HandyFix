@@ -3,7 +3,7 @@ const app = express.Router();
 const path = require('path');
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/public/welcomeScreen.html'));
+  res.redirect('/login');
 });
 
 app.get('/login', (req, res) => {
