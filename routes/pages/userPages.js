@@ -29,7 +29,7 @@ app.get('/support', (req, res) => {
 
 
 app.get('/repairs', (req, res) => {
-  res.sendFile(path.join(__dirname, `../../frontend/user/${req.query.repair}.html`))
+  res.sendFile(path.join(__dirname, `../../frontend/user/repair.html`))
 });
 
 app.get('/initiateRepair', (req, res) => {
