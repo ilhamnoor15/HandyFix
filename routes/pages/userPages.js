@@ -1,38 +1,38 @@
 const express = require("express");
 const app = express.Router();
 const path = require('path');
-
-app.get('/', (req, res) => {
+const { requireAuth } = require("../token"); 
+app.get('/', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/home.html'));
 });
 
-app.get('/booking', (req, res) => {
+app.get('/booking', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/bookings.html'))
 });
 
-app.get('/messages', (req, res) => {
+app.get('/messages', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/messages.html'))
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', requireAuth,   (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/profile.html'))
 });
 
-app.get('/settings', (req, res) => {
+app.get('/settings', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/settings.html'))
 });
 
-app.get('/support', (req, res) => {
+app.get('/support', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/support.html'))
 });
 
 
 
-app.get('/repairs', (req, res) => {
+app.get('/repairs', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, `../../frontend/user/repair.html`))
 });
 
-app.get('/initiateRepair', (req, res) => {
+app.get('/initiateRepair', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/user/initiateRepair.html'))
 });
 

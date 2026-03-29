@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
-
+const cookieParser = require("cookie-parser");
 const path = require("path");
 app.use(express.static(path.join(__dirname, "frontend")));
 const PORT = process.env.PORT || 3000;
@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 const db = require("./routes/database");
 
 app.use(express.json());
+app.use(cookieParser());
 
 const loginRouter = require("./routes/login");
 app.use("/api/", loginRouter);
