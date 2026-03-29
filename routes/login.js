@@ -23,7 +23,14 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid password" });
     }
 
-    res.json({ success: true, user: { id: user.id, email: user.email } });
+      const token = jwt.sign(
+    { email: user.email, password: user.password },
+    JWT_SECRET,
+    { expiresIn: "24h" }
+  );
+
+
+    res.json({ success: true, user: { id: user.id, email: user.email, token } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

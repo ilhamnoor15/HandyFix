@@ -111,39 +111,8 @@
     </div>
     
     <div class="flex-grow-1 overflow-auto px-2 mt-2" id="technicianList">
-    <div class="tech-card d-flex align-items-center p-3 mb-2 active-chat" onclick="openChat('John Doe', 'Active Now', 'JD')" data-name="John Doe">
-        <div class="avatar-circle">JD</div>
-        <div class="ms-3 flex-grow-1">
-            <h6 class="mb-0 fw-bold">John Doe</h6>
-            <small class="text-muted text-truncate d-block" id="preview-John-Doe">That’s a clogged...</small>
-        </div>
     </div>
-
-<div class="tech-card d-flex align-items-center p-3 mb-2" onclick="openChat('Alden Ash', 'Active Now', 'AA')" data-name="Alden Ash">
-        <div class="avatar-circle" style="background-color: #2c3e50;">AA</div>
-        <div class="ms-3 flex-grow-1">
-            <h6 class="mb-0 fw-bold">Alden Ash</h6>
-            <small class="text-muted text-truncate d-block" id="preview-Alden-Ash">Noted. I’ll ensure...</small>
-        </div>
-    </div>
-
-<div class="tech-card d-flex align-items-center p-3 mb-2" onclick="openChat('Juan Dela Cruz', 'Active 5m ago', 'JC')" data-name="Juan Dela Cruz">
-        <div class="avatar-circle" style="background-color: #16a085;">JC</div>
-        <div class="ms-3 flex-grow-1">
-            <h6 class="mb-0 fw-bold">Juan Dela Cruz</h6>
-            <small class="text-muted text-truncate d-block" id="preview-Juan-Dela-Cruz">I need to check the...</small>
-        </div>
-    </div>
-
-<div class="tech-card d-flex align-items-center p-3 mb-2" onclick="openChat('Ana Santos', 'Active Now', 'AS')" data-name="Ana Santos">
-        <div class="avatar-circle" style="background-color: #8e44ad;">AS</div>
-        <div class="ms-3 flex-grow-1">
-            <h6 class="mb-0 fw-bold">Ana Santos</h6>
-            <small class="text-muted text-truncate d-block" id="preview-Ana-Santos">Good thing you no...</small>
-        </div>
-    </div>
-            </div>
-        </div>
+</div>
 
 
 
@@ -192,6 +161,76 @@
 
 <script>
 
+const technicians = [
+    { name: 'John Doe', status: 'Active Now', initials: 'JD', preview: "That's a clogged..." },
+    { name: 'Alden Ash', status: 'Active Now', initials: 'AA', preview: "Noted. I'll ensure...", bgColor: '#2c3e50' },
+    { name: 'Juan Dela Cruz', status: 'Active 5m ago', initials: 'JC', preview: "I need to check the...", bgColor: '#16a085' },
+    { name: 'Ana Santos', status: 'Active Now', initials: 'AS', preview: "Good thing you no...", bgColor: '#8e44ad' }
+];
+
+const conversations = {
+    'John Doe': [
+        { type: 'sent', text: 'Hey John, my aircon isn\'t cooling properly anymore.'},
+        { type: 'received', text: 'It might need a deep cleaning or a freon recharge.' },
+        { type: 'sent', text: 'It\'s also leaking water inside the room.' },
+        { type: 'received', text: 'That\'s a clogged drainage. I\'ll be there by 4 PM to fix it.' }
+    ],
+    'Alden Ash': [
+        { type: 'sent', text: 'Hi Alden, I noticed some flickering lights in the kitchen. Can you check it?'},
+        { type: 'received', text: 'Good morning! Yes, that sounds like a loose connection. I can check it later.' },
+        { type: 'sent', text: 'Great. Please check the outlets as well just to be safe.' },
+        { type: 'received', text: 'Noted. I\'ll ensure all the wiring is now okay before I leave.' }
+    ],
+    'Juan Dela Cruz': [
+        { type: 'sent', text: 'Hi, I have a problem with my sink.'},
+        { type: 'received', text: 'Hello! John Doe here. I can visit at 2 PM to fix your sink.' },
+        { type: 'sent', text: 'Hi John, that would be great. How much is the estimate?' },
+        { type: 'received', text: 'I need to check the pipes first, but standard labor is around 500 pesos.' }
+    ],
+    'Ana Santos': [
+        { type: 'sent', text: 'Hi Ana, are you available to check some grounded outlets in my room?'},
+        { type: 'received', text: 'Hello! Yes, I can drop by. Is the circuit breaker tripping when you use them?' },
+        { type: 'sent', text: 'Yes, it happened twice this morning. I\'m worried it might cause a short circuit.' },
+        { type: 'received', text: 'Good thing you noticed. Please avoid using those outlets for now. I\'ll be there in an hour.' }
+    ],
+};
+
+function renderTechniciansList() {
+    const technicianList = document.getElementById('technicianList');
+    technicianList.innerHTML = '';
+
+    technicians.forEach((tech, index) => {
+        const card = document.createElement('div');
+        card.className = `tech-card d-flex align-items-center p-3 mb-2 ${index === 0 ? 'active-chat' : ''}`;
+        card.setAttribute('data-name', tech.name);
+        card.onclick = () => openChat(tech.name, tech.status, tech.initials);
+
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar-circle';
+        if (tech.bgColor) avatar.style.backgroundColor = tech.bgColor;
+        avatar.innerText = tech.initials;
+
+        const content = document.createElement('div');
+        content.className = 'ms-3 flex-grow-1';
+
+        const name = document.createElement('h6');
+        name.className = 'mb-0 fw-bold';
+        name.innerText = tech.name;
+
+        const preview = document.createElement('small');
+        preview.className = 'text-muted text-truncate d-block';
+        preview.id = `preview-${tech.name.replace(/\s+/g, '-')}`;
+        preview.innerText = tech.preview;
+
+        content.appendChild(name);
+        content.appendChild(preview);
+
+        card.appendChild(avatar);
+        card.appendChild(content);
+        technicianList.appendChild(card);
+    });
+}
+
 function getActiveTechName() {
     const activeCard = document.querySelector('.tech-card.active-chat');
     if (activeCard) {
@@ -200,21 +239,48 @@ function getActiveTechName() {
     return "John Doe"; 
 }
 
-function openChat(name, status, initial) {
-    document.querySelectorAll('.tech-card').forEach(card => {
+function openChat(name, status, initials) {
+    document.getElementById('chat-name').innerText = name;
+    document.getElementById('chat-avatar').innerText = initials;
+
+    const statusElement = document.getElementById('chat-status');
+    if (status === 'Active Now') {
+        statusElement.innerHTML = `<span class="status-dot"></span>Active Now`;
+    } else {
+        statusElement.innerText = status;
+    }
+
+    const chatWindow = document.getElementById('chat-messages');
+    chatWindow.innerHTML = ''; 
+
+    if (conversations[name]) {
+        conversations[name].forEach(msg => {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${msg.type}`;
+
+            const label = document.createElement('div');
+            label.className = 'chat-label';
+            label.innerText = (msg.type === 'sent') ? 'Customer' : 'Technician';
+
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble-box ${msg.type}`;
+            bubble.innerText = msg.text;
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(bubble);
+            chatWindow.appendChild(wrapper);
+        });
+    }
+
+    const cards = document.getElementsByClassName('tech-card');
+    for (let card of cards) {
         card.classList.remove('active-chat');
-        if(card.innerText.includes(name)) {
+        if (card.getAttribute('data-name') === name) {
             card.classList.add('active-chat');
         }
-    });
+    }
 
-    const headerName = document.querySelector('.chat-header h6') || document.querySelector('.chat-header-name');
-    if (headerName) headerName.innerText = name;
-
-    const headerAvatar = document.querySelector('.chat-header .avatar-circle');
-    if (headerAvatar) headerAvatar.innerText = initial;
-
-    document.getElementById('messageInput').value = "";
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 function updatePreview(val) {
@@ -229,155 +295,9 @@ function updatePreview(val) {
         } else {
             previewElement.innerText = val;
             previewElement.style.color = "#800000"; 
-
         }
     }
 }
-
-
-    const servicesToggle = document.getElementById('servicesToggle');
-    const dashboardLink = document.getElementById('dashboardLink');
-
-    servicesToggle.addEventListener('click', function() {
-        dashboardLink.classList.remove('active-link');
-        dashboardLink.classList.add('opacity-75');
-
-        this.classList.add('clicked-service');
-        this.classList.remove('opacity-75');
-    });
-
-
-const conversations = {
-        'John Doe': [
-            { type: 'sent', text: 'Hey John, my aircon isn’t cooling properly anymore.'},
-            { type: 'received', text: 'It might need a deep cleaning or a freon recharge.' },
-            { type: 'sent', text: 'It’s also leaking water inside the room.' },
-            { type: 'received', text: 'That’s a clogged drainage. I’ll be there by 4 PM to fix it.' }
-        ],
-        'Alden Ash': [
-            { type: 'sent', text: 'Hi Alden, I noticed some flickering lights in the kitchen. Can you check it?'},
-            { type: 'received', text: 'Good morning! Yes, that sounds like a loose connection. I can check it later.' },
-            { type: 'sent', text: 'Great. Please check the outlets as well just to be safe.' },
-            { type: 'received', text: 'Noted. I’ll ensure all the wiring is now okay before I leave.' }
-        ],
-        'Juan Dela Cruz': [
-            { type: 'sent', text: 'Hi, I have a problem with my sink.'},
-            { type: 'received', text: 'Hello! John Doe here. I can visit at 2 PM to fix your sink.' },
-            { type: 'sent', text: 'Hi John, that would be great. How much is the estimate?' },
-            { type: 'received', text: 'I need to check the pipes first, but standard labor is around 500 pesos.' }
-        ],
-        'Ana Santos': [
-            { type: 'sent', text: 'Hi Ana, are you available to check some grounded outlets in my room?'},
-            { type: 'received', text: 'Hello! Yes, I can drop by. Is the circuit breaker tripping when you use them?' },
-            { type: 'sent', text: 'Yes, it happened twice this morning. I’m worried it might cause a short circuit.' },
-            { type: 'received', text: 'Good thing you noticed. Please avoid using those outlets for now. I’ll be there in an hour.' }
-        ],
-    };
-
-    function openChat(name, status, initials) {
-    document.getElementById('chat-name').innerText = name;
-    document.getElementById('chat-avatar').innerText = initials;
-
-    const statusElement = document.getElementById('chat-status');
-    if (status === 'Active Now') {
-        statusElement.innerHTML = `<span class="status-dot"></span>Active Now`;
-    } else {
-        statusElement.innerText = status;
-    }
-
-    const chatWindow = document.getElementById('chat-messages');
-    chatWindow.innerHTML = ''; 
-
-if (conversations[name]) {
-    conversations[name].forEach(msg => {
-        const wrapper = document.createElement('div');
-        wrapper.className = `message-wrapper ${msg.type}`;
-
-        const label = document.createElement('div');
-        label.className = 'chat-label';
-        label.innerText = (msg.type === 'sent') ? 'Customer' : 'Technician';
-
-        const bubble = document.createElement('div');
-        bubble.className = `chat-bubble-box ${msg.type}`;
-        bubble.innerText = msg.text;
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(bubble);
-        chatWindow.appendChild(wrapper);
-    });
-}
-
-
-    const cards = document.getElementsByClassName('tech-card');
-    for (let card of cards) {
-        card.classList.remove('active-chat');
-        if (card.getAttribute('data-name') === name) {
-            card.classList.add('active-chat');
-        }
-    }
-
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-
-window.onload = () => openChat('John Doe', 'Active Now', 'JD');
-
-
-
-function filterTechnicians() {
-    const input = document.getElementById('techSearch').value.toLowerCase();
-    
-    const cards = document.getElementsByClassName('tech-card');
-
-    for (let i = 0; i < cards.length; i++) {
-        const name = cards[i].querySelector('h6').innerText.toLowerCase();
-
-        if (name.startsWith(input)) {
-            cards[i].style.setProperty('display', 'flex', 'important'); // Ipakita
-        } else {
-            cards[i].style.setProperty('display', 'none', 'important'); // Itago
-        }
-    }
-}
-
-const chatWindow = document.getElementById('chat-messages');
-chatWindow.innerHTML = ''; 
-
-if (conversations[name]) {
-    conversations[name].forEach(msg => {
-        const wrapper = document.createElement('div');
-        wrapper.className = `message-wrapper ${msg.type}`;
-
-        const label = document.createElement('div');
-        label.className = 'chat-label';
-        label.innerText = (msg.type === 'sent') ? 'Customer' : 'Technician';
-
-        const bubble = document.createElement('div');
-        bubble.className = `chat-bubble-box ${msg.type}`;
-        bubble.innerText = msg.text;
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(bubble);
-        
-        chatWindow.appendChild(wrapper);
-    });
-}
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'message-wrapper received'; 
-
-        const label = document.createElement('div');
-        label.className = 'chat-role-label';
-        label.innerText = 'Admin'; 
-
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-bubble-box';
-        bubble.innerText = 'Hello Maria, may I ask why you want to cancel?';
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(bubble);
-        chatWindow.appendChild(wrapper);
-
 
 function sendMessage() {
     const input = document.getElementById('messageInput');
@@ -399,6 +319,35 @@ function sendMessage() {
     }
 }
 
+function filterTechnicians() {
+    const input = document.getElementById('techSearch').value.toLowerCase();
+    const cards = document.getElementsByClassName('tech-card');
+
+    for (let i = 0; i < cards.length; i++) {
+        const name = cards[i].querySelector('h6').innerText.toLowerCase();
+
+        if (name.startsWith(input)) {
+            cards[i].style.setProperty('display', 'flex', 'important');
+        } else {
+            cards[i].style.setProperty('display', 'none', 'important');
+        }
+    }
+}
+
+function repairNav(data) {
+    window.location.href = `/user/repairs?repair=${data.name}`;
+}
+
+const servicesToggle = document.getElementById('servicesToggle');
+const dashboardLink = document.getElementById('dashboardLink');
+
+servicesToggle.addEventListener('click', function() {
+    dashboardLink.classList.remove('active-link');
+    dashboardLink.classList.add('opacity-75');
+    this.classList.add('clicked-service');
+    this.classList.remove('opacity-75');
+});
+
 document.getElementById('sendBtn').addEventListener('click', sendMessage);
 
 document.getElementById('messageInput').addEventListener('keypress', function (e) {
@@ -406,9 +355,11 @@ document.getElementById('messageInput').addEventListener('keypress', function (e
         sendMessage();
     }
 });
-function repairNav(data){
-        window.location.href = `/user/repairs?repair=${data.name}`;
-    }
+
+window.onload = () => {
+    renderTechniciansList();
+    openChat('John Doe', 'Active Now', 'JD');
+};
 
 </script>
 
