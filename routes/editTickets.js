@@ -362,4 +362,87 @@ app.post("/postTicketUser", async (req, res) => {
   }
 });
 
+app.post("/submitServiceRequest", async (req, res) => {
+  /*
+  service: 'Wall Patching & Minor Repairs',
+  issue: 'Wall Patching & Minor Repairs – Patching damaged drywall',
+  date: '6345-05-31',
+  reservation_low: '13:00',
+  reservation_high: '17:00',
+  contact: '56453',
+  address: '456456',
+  landmark: '654546'
+
+    fetch("/api/submitServiceRequest", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    })
+
+
+    TABLE:
+  idPK	INTEGER	
+user_id	INT	
+order_date	DATE	
+type	VARCHAR(100)	
+sub_type	VARCHAR(100)	
+description	TEXT	
+state	VARCHAR(100)	default: 'open'
+address	TEXT
+title  TEXT
+  */
+  try {
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+
+    console.log(req.body);
+
+    let {
+      service,
+      issue,
+      date,
+      reservation_low,
+      reservation_high,
+      contact,
+      address,
+      landmark,
+    } = req.body;
+
+    if (landmark) {
+      address = `${address}, (${landmark})`;
+    }
+
+    const result = await db.execute(
+      `
+           INSERT INTO tickets (user_id, order_date, type, sub_type, description, type, sub_type, description, address, title, reservation_low, reservation_high, phone_number)
+            VALUES ((SELECT id FROM users WHERE email = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       `,
+      [
+        email,
+        date,
+        service,
+        issue,
+        address,
+        landmark,
+        service,
+        issue,
+        address,
+        landmark,
+        reservation_low,
+        reservation_high,
+        contact,
+      ],
+    );
+
+    console.log("Service request submitted for email:", email);
+    res.json({
+      message: "Service request submitted successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error submitting service request:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 module.exports = app;

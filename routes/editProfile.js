@@ -98,5 +98,21 @@ app.get("/fetchProfileUser", async (req, res) => {
   }
 });
 
+app.get("/fetchContactAddress", async (req, res) => {
+  try {
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+    const result = await db.execute(
+      "SELECT contact_number, address FROM users WHERE email = ?",
+      [email],
+    );
+    console.log(result.rows);
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = app;
 //text
