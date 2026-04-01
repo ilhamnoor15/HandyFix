@@ -83,7 +83,7 @@ app.post("/editProfileUser", async (req, res) => {
   }
 });
 
-app.post("/fetchProfileUser", async (req, res) => {
+app.get("/fetchProfileUser", async (req, res) => {
   try {
     const decoded = jwt.decode(req.cookies.auth);
     const email = decoded.email;
