@@ -15,11 +15,19 @@ app.get("/messages", requireAuth("user"), (req, res) => {
 });
 
 app.get("/profile", requireAuth("user"), (req, res) => {
+  const query = req.query;
+  if (query.preview === "true") {
+    res.sendFile(path.join(__dirname, "../../frontend/user/personal.html"));
+  }
+
+  if (query.history === "true") {
+    res.sendFile(path.join(__dirname, "../../frontend/user/service.html"));
+  }
   res.sendFile(path.join(__dirname, "../../frontend/user/profile.html"));
 });
 
 app.get("/settings", requireAuth("user"), (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/user/settings.html"));
+  res.sendFile(path.join(__dirname, "../../frontend/user/personal.html"));
 });
 
 app.get("/support", requireAuth("user"), (req, res) => {

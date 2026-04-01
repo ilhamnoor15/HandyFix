@@ -67,6 +67,50 @@ GROUP BY t.id;
   }
 });
 
+app.get("/fetchUserCountTickets", async (req, res) => {
+  try {
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+
+    console.log("Fetching user count for email:", email);
+    const result = await db.execute(
+      `
+      SELECT COUNT(*) as count FROM tickets t
+      INNER JOIN users u ON t.user_id = u.id
+      WHERE u.email = ?;
+    `,
+      [email],
+    );
+    console.log("Fetched user count:", result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/fetchActiveUserCountTickets", async (req, res) => {
+  try {
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+
+    console.log("Fetching active user count for email:", email);
+    const result = await db.execute(
+      `
+      SELECT COUNT(*) as count FROM tickets t
+      INNER JOIN users u ON t.user_id = u.id
+WHERE u.email = ?
+AND t.state NOT IN ('closed', 'cancelled');
+    `,
+      [email],
+    );
+    console.log("Fetched active user count:", result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 app.get("/fetchPendingContractorCountTickets", async (req, res) => {
   try {
     const decoded = jwt.decode(req.cookies.auth);
@@ -278,6 +322,43 @@ app.post("/AddTicket", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/postTicketUser", async (req, res) => {
+  /*
+  CREATE TABLE `tickets` (
+	`id` integer PRIMARY KEY AUTOINCREMENT,
+	`user_id` integer,
+	`order_date` numeric,
+	`type` text(100),
+	`sub_type` text(100),
+	`description` text,
+	`state` text(100) DEFAULT 'open',
+	`address` text,
+	`title` text,
+	CONSTRAINT `fk_tickets_user_id_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+);
+  */
+
+  try {
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+    const { type, sub_type, description, address, title } = req.body;
+
+    console.log("Posting ticket for email:", email);
+    const result = await db.execute(
+      `
+           INSERT INTO tickets (user_id, type, sub_type, description, address, title)
+           VALUES ((SELECT id FROM users WHERE email = ?), ?, ?, ?, ?, ?)
+       `,
+      [email, type, sub_type, description, address, title],
+    );
+    console.log("Ticket posted for email:", email);
+    res.json({ message: "Ticket posted successfully" });
+  } catch (error) {
+    console.error("Error posting ticket:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

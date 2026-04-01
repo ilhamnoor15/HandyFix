@@ -39,6 +39,21 @@
             filter: brightness(0.9);
         }
 
+            .avatar {
+      width: 60px;   
+      height: 60px;            
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;         
+      border: 2px solid #ff7b00;
+      font-weight: bold;
+      color: #ff2929;            
+      font-size: 1.5rem;
+      background-color: #f8f9fa;  
+      user-select: none;
+    }
+
     </style>
 
 </head>
@@ -136,8 +151,7 @@
     <div class="container-fluid d-flex align-items-center justify-content-between position-relative z-1">
         <div class="d-flex align-items-center">
             <div class="position-relative">
-                <img id="profileAvatar" src="" 
-                     class="rounded-circle border border-4 border-white shadow" width="110">
+                <div class="avatar" id="profileAvatar"></div>
                 <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle p-2"></span>
             </div>
             <div class="ms-4">
@@ -188,7 +202,7 @@
     <div class="row g-4 d-flex align-items-stretch"> <div class="col-md-6">
             <h6 class="text-muted fw-bold mb-3 ms-2 text-uppercase" style="font-size: 0.75rem;">General Settings</h6>
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100"> <div class="list-group list-group-flush">
-                    <a href="personal.html" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4 border-0">
+                    <a href="/user/profile?preview=true" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4 border-0">
                         <div class="d-flex align-items-center">
                             <div class="bg-primary-subtle p-2 rounded-3 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-info-circle-fill text-primary"></i>
@@ -197,7 +211,7 @@
                         </div>
                         <i class="bi bi-chevron-right text-muted small"></i>
                     </a>
-                    <a href="service.html" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4 border-0 border-top">
+                    <a href="/user/profile?" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between p-4 border-0 border-top">
                         <div class="d-flex align-items-center">
                             <div class="bg-success-subtle p-2 rounded-3 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                                 <i class="bi bi-clock-history text-success"></i>
@@ -245,60 +259,86 @@
 
 </main>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Profile Data Variables await fetch('/api/fetchProfile').then(res => res.json());
 
-<script>
-    // User Profile Constants
-    const USER_PROFILE = {
-        name: 'Maria Santos',
-        phone: '+63 912 345 6789',
-        avatar: 'https://ui-avatars.com/api/?name=Maria+Santos&background=E5A832&color=fff&size=128',
-        membershipType: 'Gold Member',
-        totalBookings: 12,
-        activeBookings: 1,
-        bookingStatus: 'On the way',
-        memberSince: 'Jan 2024'
-    };
+            let profileData = {
+                name: '',
+                phone: '',
+                avatar: '',
+                membershipType: '',
+                memberSince: ''
+            };
+            let bookingData = {
+                total: 0,
+                active: 0,
+                status: ''
+            };
 
-    // DOM Elements
-    const profileName = document.getElementById('profileName');
-    const profilePhone = document.getElementById('profilePhone');
-    const profileAvatar = document.getElementById('profileAvatar');
-    const membershipType = document.getElementById('membershipType');
-    const totalBookings = document.getElementById('totalBookings');
-    const activeBookings = document.getElementById('activeBookings');
-    const bookingStatus = document.getElementById('bookingStatus');
-    const memberSince = document.getElementById('memberSince');
-    const servicesToggle = document.getElementById('servicesToggle');
-    const dashboardLink = document.getElementById('dashboardLink');
+            // Fetch Functions
+            async function fetchProfileData() {
+                try {
+                    const response = await fetch('/api/fetchProfile');
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    profileData = data;
+                    renderProfileData();
+                } catch (error) {
+                    console.error('Error fetching profile data:', error);
+                }
+            }
 
-    // Load profile data
-    function loadProfileData() {
-        profileName.textContent = USER_PROFILE.name;
-        profilePhone.textContent = USER_PROFILE.phone;
-        profileAvatar.src = USER_PROFILE.avatar;
-        membershipType.textContent = USER_PROFILE.membershipType;
-        totalBookings.textContent = USER_PROFILE.totalBookings;
-        activeBookings.textContent = USER_PROFILE.activeBookings;
-        bookingStatus.textContent = USER_PROFILE.bookingStatus;
-        memberSince.textContent = USER_PROFILE.memberSince;
-    }
 
-    // Event Listeners
-    servicesToggle.addEventListener('click', function() {
-        dashboardLink.classList.remove('active-link');
-        dashboardLink.classList.add('opacity-75');
-        this.classList.add('clicked-service');
-        this.classList.remove('opacity-75');
-    });
+            async function fetchBookingData() {
+                try {
+                    const countTotal = await fetch('/api/fetchUserCountTickets');
+                    if (!countTotal.ok) {
+                        throw new Error('Failed to fetch total bookings');
+                    }
+                    const data = await countTotal.json();
+                    const countActive = await fetch('/api/fetchActiveUserCountTickets');
+                    if (!countActive.ok) {
+                        throw new Error('Failed to fetch active bookings');
+                    }
+                    const activeData = await countActive.json();
+                    bookingData.total = data[0]?.count || 0;
+bookingData.active = activeData[0]?.count || 0;
+                    bookingData.status = bookingData.active > 0 ? 'Active' : 'No Active';
+                    console.log('Booking Data:', bookingData);
+                    renderBookingData();
+                } catch (error) {
+                    console.error('Error fetching booking data:', error);
+                    bookingData.total = 0;
+                    bookingData.active = 0;
+                    bookingData.status = 'Error';
+                    renderBookingData();
+                }
+            }
 
-    function repairNav(data) {
-        window.location.href = `/user/repairs?repair=${data.name}`;
-    }
 
-    // Initialize
-    loadProfileData();
-</script>
+            // Render Functions
+            function renderProfileData() {
+                document.getElementById('profileAvatar').textContent = profileData.avatar;
+                document.getElementById('profileName').textContent = profileData.name;
+                document.getElementById('profilePhone').textContent = profileData.phone;
+                document.getElementById('membershipType').textContent = profileData.membershipType;
+                    document.getElementById('memberSince').textContent = profileData.memberSince;
+            }
 
-</body>
-</html>
+            function renderBookingData() {
+                document.getElementById('totalBookings').textContent = bookingData.total;
+                document.getElementById('activeBookings').textContent = bookingData.active;
+                document.getElementById('bookingStatus').textContent = bookingData.status;
+            }
+
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', () => {
+                fetchProfileData();
+                fetchBookingData();
+
+            });
+        </script>
+ 

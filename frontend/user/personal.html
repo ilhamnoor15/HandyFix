@@ -17,7 +17,6 @@
             max-width: 900px; 
             margin: 0 auto; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-
             margin-left: auto;
             margin-right: auto;
             display: block;
@@ -29,11 +28,9 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding-top: 50px;
+            padding-top: 100px;
             min-height: 100vh;
             background-color: #f8f9fa;
-
-            padding-top: 100px;
         }
 
         .info-header {
@@ -45,7 +42,6 @@
             padding-bottom: 15px;
             border-bottom: 2px solid #FFF5F5;
         }
-
 
         .info-header h3 {
             color: #800000;
@@ -109,7 +105,7 @@
             font-size: 15px;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #800000;
         }
@@ -167,216 +163,286 @@
             transition: 0.2s;
         }
 
-
         .back-link:hover {
             color: #600000; 
             transform: translateX(-3px);
         }
 
-        .info-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
 
+        .toast-msg.success { background: #800000; color: white; }
+        .toast-msg.error   { background: #dc3545; color: white; }
+        .toast-msg.show    { opacity: 1; }
     </style>
-    
 </head>
 <body>
 
 <div class="container-fluid">
     <div class="row">
-                    <nav class="col-md-2 p-0 text-white min-vh-100 shadow d-flex flex-column justify-content-between"
-                style="background-color: #4A0E0E; position: fixed;">
-                <div>
-                    <div class="p-4 text-center">
-                        <h4 class="fw-bold m-0">LOGO</h4>
-                        <small style="color: #E5A832; letter-spacing: 2px; font-weight: bold;">HandyFix</small>
+        <nav class="col-md-2 p-0 text-white min-vh-100 shadow d-flex flex-column justify-content-between"
+            style="background-color: #4A0E0E; position: fixed;">
+            <div>
+                <div class="p-4 text-center">
+                    <h4 class="fw-bold m-0">LOGO</h4>
+                    <small style="color: #E5A832; letter-spacing: 2px; font-weight: bold;">HandyFix</small>
+                </div>
+
+                <ul class="nav flex-column mt-4 ps-3">
+                    <li class="nav-item mb-2">
+                        <a href="home.html" id="dashboardLink" class="nav-link text-white fw-bold active-link">
+                            <i class="bi bi-house-door-fill me-2"></i>Home</a>
+                    </li>
+
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white opacity-75 fw-bold d-flex align-items-center"
+                            id="servicesToggle" data-bs-toggle="collapse" href="#servicesSubmenu" role="button">
+                            <i class="bi bi-list-ul me-2"></i>
+                            <span>Services</span>
+                        </a>
+
+                        <div class="collapse" id="servicesSubmenu">
+                            <ul class="nav flex-column ms-4 mt-2 mb-2 border-start border-secondary">
+                                <li class="nav-item">
+                                    <a name="plumbing" onclick="repairNav(this)"
+                                        class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-droplet-fill me-2"></i> Plumbing Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a name="maintenance" onclick="repairNav(this)"
+                                        class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-house-check-fill me-2"></i>Home Maintenance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a name="electrical" onclick="repairNav(this)"
+                                        class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-lightning-charge-fill me-2"></i>Electrical Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a name="carpentry" onclick="repairNav(this)"
+                                        class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-tools me-2"></i>Carpentry Services</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a name="tool" onclick="repairNav(this)"
+                                        class="nav-link text-white opacity-75 py-1 small">
+                                        <i class="bi bi-briefcase-fill me-2"></i>Tool Services</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="/user/booking" class="nav-link text-white opacity-75 fw-bold"><i
+                                class="bi bi-calendar-check me-2"></i> My Bookings</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="/user/messages" class="nav-link text-white opacity-75 fw-bold"><i
+                                class="bi bi-chat-dots me-2"></i> Messages</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="/user/profile" class="nav-link text-white opacity-75 fw-bold"><i
+                                class="bi bi-person-circle me-2"></i> Profile</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="/user/support" class="nav-link text-white opacity-75 fw-bold"><i
+                                class="bi bi-question-circle me-2"></i> Help & Support</a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="/user/settings" class="nav-link text-white opacity-75 fw-bold small"><i
+                                class="bi bi-gear me-2"></i> Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/login" class="nav-link text-white opacity-75 fw-bold small"><i
+                                class="bi bi-box-arrow-right me-2"></i> Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="content-area">
+            <div class="personal-info-container">
+
+                <div class="info-header">
+                    <div class="d-flex align-items-center">
+                        <a href="profile.html" class="back-link">
+                            <i class="bi bi-arrow-left"></i>
+                        </a>
+                        <h3 class="ms-3 mb-0">Personal Information</h3>
                     </div>
 
-                    <ul class="nav flex-column mt-4 ps-3">
-                        <li class="nav-item mb-2">
-                            <a href="home.html" id="dashboardLink" class="nav-link text-white fw-bold active-link">
-                                <i class="bi bi-house-door-fill me-2"></i>Home</a>
-                        </li>
-
-                        <li class="nav-item mb-2">
-                            <a class="nav-link text-white opacity-75 fw-bold d-flex align-items-center"
-                                id="servicesToggle" data-bs-toggle="collapse" href="#servicesSubmenu" role="button">
-                                <i class="bi bi-list-ul me-2"></i>
-                                <span>Services</span>
-                            </a>
-
-                            <div class="collapse" id="servicesSubmenu">
-                                <ul class="nav flex-column ms-4 mt-2 mb-2 border-start border-secondary">
-                                    <li class="nav-item">
-                                        <a name="plumbing" onclick="repairNav(this)"
-                                            class="nav-link text-white opacity-75 py-1 small">
-                                            <i class="bi bi-droplet-fill me-2"></i> Plumbing Services</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a name="maintenance" onclick="repairNav(this)"
-                                            class="nav-link text-white opacity-75 py-1 small">
-                                            <i class="bi bi-house-check-fill me-2"></i>Home Maintenance</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a name="electrical" onclick="repairNav(this)"
-                                            class="nav-link text-white opacity-75 py-1 small">
-                                            <i class="bi bi-lightning-charge-fill me-2"></i>Electrical Services</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a name="carpentry" onclick="repairNav(this)"
-                                            class="nav-link text-white opacity-75 py-1 small">
-                                            <i class="bi bi-tools me-2"></i>Carpentry Services</a>
-                                    <li class="nav-item">
-                                        <a name="tool" onclick="repairNav(this)"
-                                            class="nav-link text-white opacity-75 py-1 small">
-                                            <i class="bi bi-briefcase-fill me-2"></i>Tool Services</a>
-                                    </li>
-                                </ul>
-                        </li>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/user/booking" class="nav-link text-white opacity-75 fw-bold"><i
-                                    class="bi bi-calendar-check me-2"></i> My Bookings</a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/user/messages" class="nav-link text-white opacity-75 fw-bold"><i
-                                    class="bi bi-chat-dots me-2"></i> Messages</a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/user/profile" class="nav-link text-white opacity-75 fw-bold"><i
-                                    class="bi bi-person-circle me-2"></i> Profile</a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/user/support" class="nav-link text-white opacity-75 fw-bold"><i
-                                    class="bi bi-question-circle me-2"></i> Help & Support</a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/user/settings" class="nav-link text-white opacity-75 fw-bold small"><i
-                                    class="bi bi-gear me-2"></i> Settings</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/login" class="nav-link text-white opacity-75 fw-bold small"><i
-                                    class="bi bi-box-arrow-right me-2"></i> Logout</a>
-                        </li>
-                    </ul>
+                    <div id="actionButtons">
+                        <button type="button" class="edit-btn" id="editBtn">Edit Details</button>
+                        <div id="saveCancelGroup" style="display: none;">
+                            <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+                            <button type="submit" class="save-btn" id="saveBtn" form="personalForm">Save Changes</button>
+                        </div>
+                    </div>
                 </div>
-            </nav>
 
-        
-<main class="content-area">
-    <div class="personal-info-container">
+                <form class="info-form" id="personalForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="first_name" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" id="last_name" readonly>
+                        </div>
+                    </div>
 
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <!-- Email is not editable since it's used as the identifier -->
+                            <input type="email" id="email" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" id="contact_number" readonly>
+                        </div>
+                    </div>
 
-<div class="info-header">
-    <div class="d-flex align-items-center">
-        <a href="profile.html" class="back-link">
-            <i class="bi bi-arrow-left"></i>
-        </a>
-        <h3 class="ms-3 mb-0">Personal Information</h3>
+                    <div class="form-group full-width">
+                        <label>Home Address</label>
+                        <textarea id="address" readonly></textarea>
+                    </div>
+                </form>
+
+            </div>
+        </main>
     </div>
-
-        <div id="actionButtons">
-            <button type="button" class="edit-btn" id="editBtn">Edit Details</button>
-            <div id="saveCancelGroup" style="display: none;">
-                <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
-                <button type="submit" class="save-btn" id="saveBtn" form="personalForm">Save Changes</button>
-            </div>
-        </div>
-    </div>
-    
-    <form class="info-form" id="personalForm">
-        <div class="form-row">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" value="Maria Santos" readonly>
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" value="maria.santos@email.com" readonly>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" value="+63 912 345 6789" readonly>
-            </div>
-            <div class="form-group">
-                <label>Birthdate</label>
-                <input type="date" value="1995-05-15" readonly>
-            </div>
-        </div>
-
-        <div class="form-group full-width">
-            <label>Home Address</label>
-            <textarea readonly>123 Handy Street, Quezon City, Philippines</textarea>
-        </div>
-    </form>
 </div>
 
-</main>
+<!-- Toast notification -->
+<div class="toast-msg" id="toastMsg"></div>
 
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // ── Toast helper ──────────────────────────────────────────────
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = message;
+        toast.className = `toast-msg ${type} show`;
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
+    // ── Fetch & populate profile on page load ─────────────────────
+    async function loadProfile() {
+        try {
+            const res = await fetch('/api/fetchProfileUser', {
+                method: 'GET',
+                credentials: 'include'   // sends the auth cookie
+            });
+
+            if (!res.ok) throw new Error('Failed to fetch profile');
+
+            const user = await res.json();
+
+            document.getElementById('first_name').value    = user.first_name    || '';
+            document.getElementById('last_name').value     = user.last_name     || '';
+            document.getElementById('email').value         = user.email         || '';
+            document.getElementById('contact_number').value = user.contact_number || '';
+            document.getElementById('address').value       = user.address       || '';
+
+        } catch (err) {
+            console.error('Error loading profile:', err);
+            showToast('Could not load profile data.', 'error');
+        }
+    }
+
+    loadProfile();
+
+    // ── Edit / Cancel / Save logic ────────────────────────────────
+    const editBtn       = document.getElementById('editBtn');
+    const cancelBtn     = document.getElementById('cancelBtn');
+    const saveCancelGroup = document.getElementById('saveCancelGroup');
+    const form          = document.getElementById('personalForm');
+
+    // Fields the user is allowed to edit (email is intentionally excluded)
+    const editableIds = ['first_name', 'last_name', 'contact_number', 'address'];
+
+    editBtn.addEventListener('click', () => {
+        editBtn.style.display = 'none';
+        saveCancelGroup.style.display = 'inline-block';
+
+        editableIds.forEach(id => {
+            const el = document.getElementById(id);
+            el.removeAttribute('readonly');
+            el.classList.add('editable-input');
+        });
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        if (confirm('Discard changes?')) {
+            loadProfile();          // reload original data from server
+            resetToReadOnly();
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            first_name:     document.getElementById('first_name').value.trim(),
+            last_name:      document.getElementById('last_name').value.trim(),
+            contact_number: document.getElementById('contact_number').value.trim(),
+            address:        document.getElementById('address').value.trim()
+        };
+
+        try {
+            const res = await fetch('/api/editProfileUser', {
+                method: 'POST',
+                credentials: 'include',          // sends the auth cookie
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error('Save failed');
+
+            resetToReadOnly();
+            showToast('Changes saved successfully!', 'success');
+
+        } catch (err) {
+            console.error('Error saving profile:', err);
+            showToast('Could not save changes. Please try again.', 'error');
+        }
+    });
+
+    function resetToReadOnly() {
+        editableIds.forEach(id => {
+            const el = document.getElementById(id);
+            el.setAttribute('readonly', true);
+            el.classList.remove('editable-input');
+        });
+        saveCancelGroup.style.display = 'none';
+        editBtn.style.display = 'block';
+    }
+
+    // ── Sidebar nav helper ────────────────────────────────────────
     const servicesToggle = document.getElementById('servicesToggle');
-    const dashboardLink = document.getElementById('dashboardLink');
+    const dashboardLink  = document.getElementById('dashboardLink');
 
-    servicesToggle.addEventListener('click', function() {
+    servicesToggle.addEventListener('click', function () {
         dashboardLink.classList.remove('active-link');
         dashboardLink.classList.add('opacity-75');
         this.classList.add('clicked-service');
         this.classList.remove('opacity-75');
     });
 
-    const editBtn = document.getElementById('editBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const saveCancelGroup = document.getElementById('saveCancelGroup');
-    const form = document.getElementById('personalForm');
-
-    editBtn.addEventListener('click', () => {
-        editBtn.style.display = 'none'; 
-        saveCancelGroup.style.display = 'inline-block'; 
-        
-        const inputs = form.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            input.removeAttribute('readonly'); 
-            input.classList.add('editable-input'); 
-        });
-    });
-
-    cancelBtn.addEventListener('click', () => {
-        if(confirm("Discard changes?")) {
-            location.reload(); 
-        }
-    });
-
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const inputs = form.querySelectorAll('input, textarea');
-
-    inputs.forEach(input => {
-        input.setAttribute('readonly', true);
-        input.classList.remove('editable-input');
-    });
-
-    saveCancelGroup.style.display = 'none';
-    editBtn.style.display = 'block';
-
-    inputs.forEach(input => {
-        localStorage.setItem('saved_' + input.previousElementSibling.innerText, input.value);
-    });
-
-    alert("Changes saved successfully!");
-});
-function repairNav(data){
+    function repairNav(data) {
         window.location.href = `/user/repairs?repair=${data.name}`;
     }
 </script>
