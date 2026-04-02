@@ -35,6 +35,7 @@
     .join("");
 
   const serviceName = mount.dataset.serviceName || "HandyFix service";
+  const serviceGenre = (mount.dataset.genre || "").trim();
 
   mount.innerHTML = `
         <form id="bookingForm">
@@ -298,7 +299,8 @@
   const selectedIssueLabel = () => {
     const selected =
       serviceSelect && serviceSelect.value ? serviceSelect.value : "";
-    return selected ? `${serviceName} – ${selected}` : serviceName;
+    const label = selected ? `${serviceName} – ${selected}` : serviceName;
+    return serviceGenre ? `${serviceGenre} – ${label}` : label;
   };
 
   const submitRequest = () => {
@@ -333,15 +335,20 @@
         contact: phoneInput.value,
         address: addressInput.value,
         landmark: landmarkInput.value,
+        genre: serviceGenre,
+        description: issueDetails.value,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           if (modalMessage) {
+            const subject = serviceGenre
+              ? `${serviceGenre} – ${serviceName}`
+              : serviceName;
             modalMessage.innerText =
               data.message ||
-              `Your booking request for ${serviceName} has been sent.`;
+              `Your booking request for ${subject} has been sent.`;
           }
           if (successModal) {
             successModal.show();

@@ -103,7 +103,8 @@
           responseMessage.style.color = "green";
           responseMessage.textContent = result.message || "Registration successful!";
           form.reset(); // optional: clear form
-          window.location.href = '/user/dashboard';
+
+
         } else {
           responseMessage.style.color = "red";
           responseMessage.textContent = result.error || "Registration failed.";
@@ -114,6 +115,11 @@
         console.error(err);
       }
     });
+
+            async function redirect() {
+                window.location.href = '/user';
+
+        }
   </script>
 
 </body>

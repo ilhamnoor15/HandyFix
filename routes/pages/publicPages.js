@@ -10,24 +10,26 @@ app.get("/", (req, res) => {
   const decoded = jwt.decode(req.cookies.auth);
   if (decoded) {
     if (decoded.role === "user") {
-      res.redirect("/user/");
+      return res.redirect("/user/");
     }
     if (decoded.role === "contractor") {
-      res.redirect("/contractor/");
+      return res.redirect("/contractor/");
     }
     if (decoded.role === "admin") {
-      res.redirect("/admin/dashboard");
+      return res.redirect("/admin/dashboard");
     }
   }
-  res.redirect("/login");
+  return res.redirect("/login");
 });
 
 app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/public/login.html"));
+  return res.sendFile(path.join(__dirname, "../../frontend/public/login.html"));
 });
 
 app.get("/register", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/public/register.html"));
+  return res.sendFile(
+    path.join(__dirname, "../../frontend/public/register.html"),
+  );
 });
 
 module.exports = app;

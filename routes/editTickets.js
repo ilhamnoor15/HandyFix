@@ -21,7 +21,27 @@ FOREIGN KEY (user_id) REFERENCES users(id)
 
 app.get("/AllTickets", async (req, res) => {
   try {
-    const result = await db.execute("SELECT * FROM tickets");
+    const result = await db.execute(
+      "SELECT * FROM tickets ORDER BY order_date DESC",
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/AllRequestAdmin", async (req, res) => {
+  try {
+    const result = await db.execute(
+      `
+              SELECT a.*, t.*  FROM assignments a
+      INNER JOIN users u ON a.contractor_id = u.id
+      INNER JOIN tickets t ON a.ticket_id = t.id
+      WHERE t.state != 'closed' AND t.state != 'cancelled';
+        `,
+    );
 
     res.json(result.rows);
   } catch (err) {
@@ -55,7 +75,7 @@ LEFT JOIN assignments a ON t.id = a.ticket_id
 LEFT JOIN users c ON a.contractor_id = c.id
 LEFT JOIN fixes f ON f.service = t.type
 WHERE u.email = ?
-GROUP BY t.id;
+GROUP BY t.id ORDER BY t.order_date DESC;
        `,
       [email],
     );
@@ -390,6 +410,21 @@ description	TEXT
 state	VARCHAR(100)	default: 'open'
 address	TEXT
 title  TEXT
+
+
+
+{
+  service: 'Wall Patching & Minor Repairs',
+  issue: 'Maintenance – Wall Patching & Minor Repairs – Patching damaged drywall',
+  date: '275760-05-24',
+  reservation_low: '13:00',
+  reservation_high: '17:00',
+  contact: '09193197805',
+  address: 'not required',
+  landmark: '',
+  genre: 'Maintenance',
+  description: '2314r2r3'
+}
   */
   try {
     const decoded = jwt.decode(req.cookies.auth);
@@ -406,6 +441,8 @@ title  TEXT
       contact,
       address,
       landmark,
+      description,
+      genre,
     } = req.body;
 
     if (landmark) {
@@ -414,23 +451,36 @@ title  TEXT
 
     const result = await db.execute(
       `
-           INSERT INTO tickets (user_id, order_date, type, sub_type, description, type, sub_type, description, address, title, reservation_low, reservation_high, phone_number)
-            VALUES ((SELECT id FROM users WHERE email = ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO tickets (
+  user_id,
+  order_date,
+  type,
+  sub_type,
+  title,
+  description,
+  address,
+  reservation_low,
+  reservation_high,
+  phone_number,
+  reservation_date
+)
+VALUES (
+  (SELECT id FROM users WHERE email = ?),
+  strftime('%d/%m/%Y', 'now'),
+  ?, ?, ?, ?, ?, ?, ?, ?, ?
+)
        `,
       [
         email,
-        date,
+        genre,
         service,
         issue,
+        description,
         address,
-        landmark,
-        service,
-        issue,
-        address,
-        landmark,
         reservation_low,
         reservation_high,
         contact,
+        date,
       ],
     );
 

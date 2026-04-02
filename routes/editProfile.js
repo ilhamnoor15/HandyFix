@@ -106,6 +106,8 @@ app.get("/fetchContactAddress", async (req, res) => {
       "SELECT contact_number, address FROM users WHERE email = ?",
       [email],
     );
+    //mm/dd/yyyy
+    result.currentDate = new Date().toLocaleDateString("en-US");
     console.log(result.rows);
     res.json(result.rows[0]);
   } catch (err) {
