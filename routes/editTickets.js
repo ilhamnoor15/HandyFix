@@ -495,4 +495,29 @@ VALUES (
   }
 });
 
+app.post("/AssignContractor", async (req, res) => {
+  try {
+    const { ticketId, contractorId } = req.body;
+
+    console.log(req.body);
+
+    //RESERVATION FORMAT: YYYY-MM-DD
+    //RESERVATION BASED ON THE TICKETS TABLE, RESERVATION IN ASSIGNMENTS IS ONLY FOR TODAY
+
+    await db.execute(
+      `INSERT INTO assignments (ticket_id, contractor_id, reservation) 
+       VALUES (?, ?, datetime('now', '+1 day'))`,
+      [ticketId, contractorId],
+    );
+
+    await db.execute(`UPDATE tickets SET state = 'assigned' WHERE id = ?`, [
+      ticketId,
+    ]);
+    res.json({ message: "Contractor assigned successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = app;

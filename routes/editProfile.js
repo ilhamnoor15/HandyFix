@@ -116,5 +116,22 @@ app.get("/fetchContactAddress", async (req, res) => {
   }
 });
 
+app.post("/fetchContractors", async (req, res) => {
+  const { specialization } = req.body;
+  try {
+    const result = await db.execute(
+      `SELECT u.id, u.first_name || ' ' || u.last_name AS name
+   FROM users u
+   JOIN skills f ON u.id = f.contractor_id
+   WHERE u.type = 'contractor' AND f.type = ?`,
+      [specialization],
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = app;
 //text

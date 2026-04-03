@@ -512,18 +512,6 @@
 </div>
 
 <script>
-  /* ── Contractor data ── */
-  const contractors = [
-    { id: 1, name: "Carlos Reyes",    specialty: "Plumbing & Pipework" },
-    { id: 2, name: "Maria Santos",   specialty: "Electrical Systems" },
-    { id: 3, name: "James Dela Cruz",specialty: "Carpentry & Joinery" },
-    { id: 4, name: "Ana Villanueva", specialty: "Painting & Finishing" },
-    { id: 5, name: "Rodel Bautista", specialty: "Roofing & Waterproofing" },
-    { id: 6, name: "Grace Mendoza",  specialty: "HVAC & Ventilation" },
-    { id: 7, name: "Dennis Lim",     specialty: "General Repairs" },
-    { id: 8, name: "Toni Aquino",    specialty: "Tiling & Flooring" },
-  ];
-
   /* ── Sidebar nav ── */
   document.getElementById('menuBtn').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
@@ -537,10 +525,13 @@
   });
 
   /* ── Table ── */
-  const table    = document.getElementById('requestsTable');
-  const tbody    = document.getElementById('requestsTbody');
+  const table     = document.getElementById('requestsTable');
+  const tbody     = document.getElementById('requestsTbody');
   const assignBtn = document.getElementById('assignBtn');
+
   let selectedRequestId = null;
+  let selectedRequest   = null;
+  let allTickets        = [];
 
   async function fetchRequests() {
     try {
@@ -555,17 +546,22 @@
   }
 
   function populateTable(tickets) {
+    allTickets = tickets; // store full dataset
     tbody.innerHTML = '';
+
     if (!tickets || tickets.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6">No service requests available</td></tr>';
       assignBtn.disabled = true;
       assignBtn.textContent = 'Assign Contractor';
       selectedRequestId = null;
+      selectedRequest = null;
       return;
     }
+
     tickets.forEach(ticket => {
       const row = document.createElement('tr');
       row.dataset.id = ticket.id;
+
       row.innerHTML = `
         <td>${ticket.id}</td>
         <td>${ticket.user_id || 'Unknown'}</td>
@@ -574,9 +570,12 @@
         <td>${ticket.order_date || ''}</td>
         <td>${ticket.state || 'pending'}</td>
       `;
+
       tbody.appendChild(row);
     });
+
     selectedRequestId = null;
+    selectedRequest = null;
     assignBtn.disabled = true;
     assignBtn.textContent = 'Assign Contractor';
   }
@@ -584,11 +583,19 @@
   table.addEventListener('click', function(e) {
     const row = e.target.closest('tr');
     if (!row || row.parentNode.tagName === 'THEAD') return;
+
     tbody.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
     row.classList.add('selected');
-    selectedRequestId = row.getAttribute('data-id');
+
+    const id = row.getAttribute('data-id');
+
+    selectedRequestId = id;
+    selectedRequest = allTickets.find(t => String(t.id) === String(id));
+
     assignBtn.disabled = false;
     assignBtn.textContent = `Assign Contractor (ID: ${selectedRequestId})`;
+
+    console.log("Selected full object:", selectedRequest);
   });
 
   /* ── Add Ticket Form ── */
@@ -598,6 +605,7 @@
   addTicketForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     addTicketMessage.textContent = '';
+
     const payload = {
       user_id:     Number(document.getElementById('userIdInput').value),
       order_date:  document.getElementById('orderDateInput').value,
@@ -606,19 +614,23 @@
       description: document.getElementById('descriptionInput').value.trim(),
       state:       document.getElementById('stateInput').value,
     };
+
     try {
       const response = await fetch('/api/AddTicket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
       if (!response.ok) {
         const err = await response.json();
         throw new Error(err.error || 'Could not create ticket');
       }
+
       addTicketMessage.style.color = 'green';
       addTicketMessage.textContent = 'Ticket added successfully.';
       addTicketForm.reset();
+
       await fetchRequests();
     } catch (error) {
       console.error(error);
@@ -633,44 +645,67 @@
   });
 
   /* ── Contractor Modal ── */
-  const modal            = document.getElementById('contractorModal');
-  const contractorList   = document.getElementById('contractorList');
-  const modalCancelBtn   = document.getElementById('modalCancelBtn');
-  const modalAssignBtn   = document.getElementById('modalAssignBtn');
+  const modal             = document.getElementById('contractorModal');
+  const contractorList    = document.getElementById('contractorList');
+  const modalCancelBtn    = document.getElementById('modalCancelBtn');
+  const modalAssignBtn    = document.getElementById('modalAssignBtn');
   const modalRequestBadge = document.getElementById('modalRequestBadge');
+
   let selectedContractor = null;
 
   function getInitials(name) {
     return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   }
 
-  function openContractorModal(requestId) {
-    selectedContractor = null;
-    modalAssignBtn.disabled = true;
-    modalRequestBadge.textContent = `Request #${requestId}`;
+  async function openContractorModal(request) {
+    if (!request) return;
 
-    contractorList.innerHTML = '';
-    contractors.forEach(c => {
-      const li = document.createElement('li');
-      li.dataset.id = c.id;
-      li.innerHTML = `
-        <div class="contractor-avatar">${getInitials(c.name)}</div>
-        <div class="contractor-info">
-          <div class="name">${c.name}</div>
-          <div class="specialty">${c.specialty}</div>
-        </div>
-        <i class="fas fa-check-circle contractor-check"></i>
-      `;
-      li.addEventListener('click', () => {
-        contractorList.querySelectorAll('li').forEach(el => el.classList.remove('selected'));
-        li.classList.add('selected');
-        selectedContractor = c;
-        modalAssignBtn.disabled = false;
+    try {
+      const response = await fetch(`/api/fetchContractors`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: selectedRequest ? JSON.stringify({ specialization: selectedRequest.type }) : '{}',
+
       });
-      contractorList.appendChild(li);
-    });
 
-    modal.classList.add('active');
+      if (!response.ok) throw new Error('Failed to load contractors');
+
+      const contractors = await response.json();
+
+      selectedContractor = null;
+      modalAssignBtn.disabled = true;
+      modalRequestBadge.textContent = `Request #${request.id}`;
+
+      contractorList.innerHTML = '';
+
+      contractors.forEach(c => {
+        const li = document.createElement('li');
+        li.dataset.id = c.id;
+
+        li.innerHTML = `
+          <div class="contractor-avatar">${getInitials(c.name)}</div>
+          <div class="contractor-info">
+            <div class="name">${c.name}</div>
+            <div class="specialty">${c.specialty}</div>
+          </div>
+          <i class="fas fa-check-circle contractor-check"></i>
+        `;
+
+        li.addEventListener('click', () => {
+          contractorList.querySelectorAll('li').forEach(el => el.classList.remove('selected'));
+          li.classList.add('selected');
+          selectedContractor = c;
+          modalAssignBtn.disabled = false;
+        });
+
+        contractorList.appendChild(li);
+      });
+
+      modal.classList.add('active');
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function closeModal() {
@@ -686,32 +721,37 @@
   });
 
   modalAssignBtn.addEventListener('click', async function() {
-    if (!selectedContractor) return;
+    if (!selectedContractor || !selectedRequestId) return;
 
-    console.log(`Assigned contractor: ${selectedContractor.name} (ID: ${selectedContractor.id}) to Request #${selectedRequestId}`);
+    console.log(`Assigned contractor: ${JSON.stringify(selectedContractor.id )} to Request #${selectedRequestId}`);
+
 
     try {
-      const response = await fetch(`/api/EditTickets/${selectedRequestId}`, {
-        method: 'PUT',
+
+
+      const assignResponse = await fetch('/api/assignContractor', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: 'assigned' }),
+        body: JSON.stringify({ ticketId: selectedRequestId, contractorId: selectedContractor.id }),
       });
-      if (!response.ok) {
-        const payload = await response.json();
-        throw new Error(payload.error || 'Failed to assign contractor');
+
+      if (!assignResponse.ok) {
+        const err = await assignResponse.json();
+        throw new Error(err.error || 'Could not assign contractor');
       }
+
       await fetchRequests();
+
     } catch (error) {
       console.error(error);
     }
 
     closeModal();
-    window.location.href = `Assign Contractor.html?requestId=${selectedRequestId}&contractorId=${selectedContractor.id}`;
   });
 
   assignBtn.addEventListener('click', function() {
-    if (!this.disabled && selectedRequestId) {
-      openContractorModal(selectedRequestId);
+    if (!this.disabled && selectedRequest) {
+      openContractorModal(selectedRequest);
     } else {
       alert('Please select a request first.');
     }
@@ -720,6 +760,7 @@
   /* ── Init ── */
   document.addEventListener('DOMContentLoaded', () => {
     const currentFile = window.location.pathname.split('/').pop() || 'Service_Requests.html';
+
     document.querySelectorAll('.sidebar li').forEach(li => {
       const page = li.getAttribute('data-page');
       if (page === currentFile || page.endsWith(currentFile)) {
@@ -728,6 +769,7 @@
         li.classList.remove('active');
       }
     });
+
     fetchRequests();
   });
 </script>
