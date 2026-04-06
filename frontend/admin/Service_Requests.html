@@ -508,7 +508,7 @@
 
   async function fetchRequests() {
     try {
-      const response = await fetch('/api/AllTickets');
+      const response = await fetch('/api/AllOpenTickets');
       if (!response.ok) throw new Error('Failed to load requests');
       const tickets = await response.json();
       populateTable(tickets);

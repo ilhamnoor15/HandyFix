@@ -32,6 +32,19 @@ app.get("/AllTickets", async (req, res) => {
   }
 });
 
+app.get("/AllOpenTickets", async (req, res) => {
+  try {
+    const result = await db.execute(
+      `SELECT * FROM tickets WHERE NOT state IN ('closed', 'cancelled', 'assigned') ORDER BY order_date DESC`,
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.get("/AllRequestAdmin", async (req, res) => {
   try {
     const result = await db.execute(
@@ -537,7 +550,7 @@ app.get("/fetchAssignments", async (req, res) => {
     fetch all tickets, return id, costumers name, contractors name, fetch both names from user ID, looked with user_id and contractor_id */
     const result = await db.execute(
       `
-SELECT a.*, u1.first_name AS customer_first_name, u1.last_name AS customer_last_name, u2.first_name AS contractor_first_name, u2.last_name AS contractor_last_name, t.state AS ticket_state
+SELECT a.id as jobId, t.type||' - '||t.sub_type as service_name, u1.first_name AS customer_first_name, u1.last_name AS customer_last_name, u2.first_name AS contractor_first_name, u2.last_name AS contractor_last_name, t.state AS ticket_state
 FROM assignments a
 INNER JOIN users u1 ON a.user_id = u1.id
 INNER JOIN users u2 ON a.contractor_id = u2.id
