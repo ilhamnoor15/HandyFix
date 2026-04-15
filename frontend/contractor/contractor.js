@@ -193,7 +193,25 @@ function renderUserInSidebar(user) {
 
 /* ─── ACTIVE PAGE ────────────────────────────────────────── */
 function markActivePage() {
-  const path = window.location.pathname.split("/").pop();
+  // Contractor pages are served via routes like:
+  //   /contract/          -> contractor_dashboard.html
+  //   /contract/bookings  -> contractor_bookings.html
+  //   /contract/messages  -> contractor_messages.html
+  // The original implementation assumed direct file navigation.
+  const rawPath = window.location.pathname.replace(/\/+$/, "");
+  const segs = rawPath.split("/").filter(Boolean);
+  const last = segs[segs.length - 1] || "";
+
+  const routeToPage = {
+    contract: CONFIG.pages.dashboard,
+    bookings: CONFIG.pages.bookings,
+    messages: CONFIG.pages.messages,
+    calendar: CONFIG.pages.calendar,
+    profile: CONFIG.pages.profile,
+    settings: CONFIG.pages.settings,
+  };
+
+  const path = routeToPage[last] || last;
   document.querySelectorAll(".nav-item[data-page]").forEach((item) => {
     item.classList.toggle("active", item.dataset.page === path);
   });
