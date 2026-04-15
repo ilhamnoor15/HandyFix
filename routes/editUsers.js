@@ -152,7 +152,6 @@ app.post("/AddUser", async (req, res) => {
     res.json({
       success: true,
       message: "User added successfully",
-      userId: result.lastInsertRowid,
     });
   } catch (err) {
     console.error(err);

@@ -76,7 +76,7 @@ app.post("/sendMessageUser", async (req, res) => {
     console.log("Sending message for email:", email);
     const result = await db.execute(
       `
-           INSERT INTO messages (ticket_id, content, user_id)
+           INSERT INTO messages (ticket_id, message, user_id)
            VALUES (?, ?, (SELECT id FROM users WHERE email = ?))
        `,
       [ticket_id, content, email],

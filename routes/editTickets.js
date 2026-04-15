@@ -526,6 +526,21 @@ app.post("/AssignContractor", async (req, res) => {
     await db.execute(`UPDATE tickets SET state = 'assigned' WHERE id = ?`, [
       ticketId,
     ]);
+
+    /*create an empty set of messages for the messages. so its displayed in messages nav.
+    
+    idPK	INTEGER	
+ticket_id	INT	
+user_id	INT	
+contractor_id	INT	
+message	VARCHAR(100)	
+messager_id	INT	
+message_date	DATE*/
+    await db.execute(
+      `INSERT INTO messages (ticket_id, user_id, contractor_id, message, messager_id, message_date) 
+       VALUES (?, (SELECT id FROM users WHERE email = ?), ?, '', (SELECT id FROM users WHERE email = ?), datetime('now', '+1 day'))`,
+      [ticketId, email, contractorId, email],
+    );
     res.json({ message: "Contractor assigned successfully" });
   } catch (err) {
     console.error(err);
@@ -592,4 +607,44 @@ app.get("/fetchTicketDetailsContractor", async (req, res) => {
   }
 });
 
+app.post("/CloseTicketContractor", async (req, res) => {
+  try {
+    const { ticketId } = req.body;
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+    //update ticket state to closed, but only if the contractor is assigned to the ticket
+    await db.execute(
+      `UPDATE tickets SET state = 'closed' WHERE id = ? AND id IN (SELECT ticket_id FROM assignments WHERE contractor_id = (SELECT id FROM users WHERE email = ?))`,
+      [ticketId, email],
+    );
+    res.json({ message: "Ticket closed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.get("/fetchAllAssignedTicketsContractor", async (req, res) => {
+  try {
+    const decoded = jwt.decode(req.cookies.auth);
+    const email = decoded.email;
+    //fetch all the tickets with the contractor email from users, the name of user too.
+    const result = await db.execute(
+      `
+      select t.*, u.first_name||' '||u.last_name as customer_name from tickets t
+      inner join users u on t.user_id = u.id
+      inner join assignments a on t.id = a.ticket_id
+      inner join users c on a.contractor_id = c.id
+      where c.email = ?
+       `,
+      [email],
+    );
+
+    console.log("Fetched assignment:", result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 module.exports = app;
