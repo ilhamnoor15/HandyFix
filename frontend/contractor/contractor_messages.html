@@ -577,73 +577,123 @@
 </div>
 <script src="/contractor/contractor.js"></script>
 <script>
-/* ── Mock Data ───────────────────────────────────────────────── */
-const conversations = [
-  {
-    id: 1, name: 'Maria Santos', initials: 'MS', online: true, unread: 3,
-    lastMsg: 'Is it possible to reschedule to Thursday?',
-    lastTime: '10:32 AM',
-    messages: [
-      { id:1, from:'them', text:'Hi! I booked a plumbing repair for tomorrow.', time:'9:01 AM', date:'Today' },
-      { id:2, from:'me',   text:'Hello Maria! Yes, I received your booking. I will be there by 9 AM.', time:'9:05 AM', date:'Today', read:true },
-      { id:3, from:'them', text:'Thank you! Do you need me to prepare anything?', time:'9:08 AM', date:'Today' },
-      { id:4, from:'me',   text:'Please make sure the water main is accessible and the area under the sink is cleared.', time:'9:12 AM', date:'Today', read:true },
-      { id:5, from:'them', text:'Got it! One more thing…', time:'10:30 AM', date:'Today' },
-      { id:6, from:'them', text:'Is it possible to reschedule to Thursday?', time:'10:32 AM', date:'Today' },
-    ]
-  },
-  {
-    id: 2, name: 'Carlos Reyes', initials: 'CR', online: false, unread: 1,
-    lastMsg: 'Perfect, see you then!',
-    lastTime: 'Yesterday',
-    messages: [
-      { id:1, from:'them', text:'Good afternoon! I need electrical wiring done for my 2nd floor.', time:'2:00 PM', date:'Yesterday' },
-      { id:2, from:'me',   text:'Hi Carlos! Sure, I can do that. I have you scheduled for the 20th.', time:'2:10 PM', date:'Yesterday', read:true },
-      { id:3, from:'them', text:'Perfect, see you then!', time:'2:15 PM', date:'Yesterday' },
-    ]
-  },
-  {
-    id: 3, name: 'Ana Lim', initials: 'AL', online: true, unread: 0,
-    lastMsg: 'I will provide the paint colors.',
-    lastTime: 'Mon',
-    messages: [
-      { id:1, from:'them', text:'Hello! I want the living room and dining painted by next week.', time:'10:00 AM', date:'Monday' },
-      { id:2, from:'me',   text:'Hi Ana! Sounds good. I will prepare everything needed.', time:'10:20 AM', date:'Monday', read:true },
-      { id:3, from:'them', text:'I will provide the paint colors.', time:'10:25 AM', date:'Monday' },
-      { id:4, from:'me',   text:'Perfect! See you on the 22nd.', time:'10:28 AM', date:'Monday', read:true },
-    ]
-  },
-  {
-    id: 4, name: 'Pedro Villanueva', initials: 'PV', online: false, unread: 0,
-    lastMsg: 'The aircon is working great now!',
-    lastTime: 'Jul 10',
-    messages: [
-      { id:1, from:'me',   text:'Hi Pedro! Your aircon service is done. Let me know if there are any issues.', time:'3:00 PM', date:'Jul 10', read:true },
-      { id:2, from:'them', text:'The aircon is working great now!', time:'3:30 PM', date:'Jul 10' },
-    ]
-  },
-  {
-    id: 5, name: 'Rosa Garcia', initials: 'RG', online: true, unread: 1,
-    lastMsg: 'Can you give me a quotation for the tiles?',
-    lastTime: 'Jul 9',
-    messages: [
-      { id:1, from:'them', text:'Hi! The tile repair was really good work, thank you!', time:'8:00 AM', date:'Jul 9' },
-      { id:2, from:'me',   text:'Thank you Rosa! Happy to help.', time:'8:10 AM', date:'Jul 9', read:true },
-      { id:3, from:'them', text:'Can you give me a quotation for the tiles?', time:'8:15 AM', date:'Jul 9' },
-    ]
-  },
-];
+/* ── Data (loaded from API) ───────────────────────────────────── */
+let conversations = [];
+
+async function fetchMessagesContractor() {
+  try {
+    const res = await fetch('/api/fetchMessagesContractor');
+    if (!res.ok) throw new Error('Failed to fetch messages');
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    showToast('Failed to load messages', 'error');
+    return [];
+  }
+}
+
+function nameToInitials(name) {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() &&
+         a.getMonth() === b.getMonth() &&
+         a.getDate() === b.getDate();
+}
+
+function dateLabel(d) {
+  const now = new Date();
+  const y = new Date(now);
+  y.setDate(now.getDate() - 1);
+  if (isSameDay(d, now)) return 'Today';
+  if (isSameDay(d, y)) return 'Yesterday';
+  return d.toLocaleDateString('en-PH', { weekday: 'long' });
+}
+
+function safeDate(value) {
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
+function buildConversations(rows) {
+  const byTicket = new Map();
+
+  rows.forEach(r => {
+    const ticketId = r.ticket_id;
+    if (!byTicket.has(ticketId)) {
+      const customerName = `${r.user_first_name || ''} ${r.user_last_name || ''}`.trim() || `Ticket #${ticketId}`;
+      byTicket.set(ticketId, {
+        id: ticketId, // use ticket_id as conversation id
+        ticketLabel: `Ticket #${ticketId}`,
+        name: customerName,
+        initials: nameToInitials(customerName),
+        online: false,
+        unread: 0,
+        lastMsg: 'No messages yet',
+        lastTime: '',
+        messages: [],
+      });
+    }
+
+    // Skip the "placeholder" rows created on assignment.
+    if (r.message == null) return;
+
+    const convo = byTicket.get(ticketId);
+    const d = safeDate(r.message_date);
+    const timeStr = d.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
+    const from = r.contractor_id != null ? 'me' : 'them';
+
+    convo.messages.push({
+      id: convo.messages.length + 1,
+      from,
+      text: String(r.message),
+      time: timeStr,
+      date: dateLabel(d),
+      ts: d.getTime(),
+      read: from === 'me',
+    });
+  });
+
+  const list = Array.from(byTicket.values());
+
+  // Sort messages + compute preview + sort newest first.
+  list.forEach(c => {
+    c.messages.sort((a, b) => a.ts - b.ts);
+    c.messages.forEach((m, i) => { m.id = i + 1; });
+    const last = c.messages[c.messages.length - 1];
+    if (last) {
+      c.lastMsg = last.text;
+      c.lastTime = last.time || '';
+    }
+  });
+
+  list.sort((a, b) => {
+    const aLast = a.messages.length ? a.messages[a.messages.length - 1].ts : 0;
+    const bLast = b.messages.length ? b.messages[b.messages.length - 1].ts : 0;
+    return bLast - aLast;
+  });
+
+  return list;
+}
 
 let activeConversationId = null;
 
 /* ── Init ───────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initSidebar();
   initUser();
   initHeaderDate();
   initToastContainer();
   markActivePage();
+
+  const rows = await fetchMessagesContractor();
+  conversations = buildConversations(rows);
   renderContacts(conversations);
+  updateUnreadCount();
+
   // Auto-adjust textarea
   const input = document.getElementById('chatInput');
   if (input) input.style.height = 'auto';
@@ -671,10 +721,10 @@ function renderContacts(list) {
       </div>
       <div class="contact-info">
         <div class="contact-name">
-          <span>${c.name}</span>
+          <span>${escapeHtml(c.ticketLabel || `Ticket #${c.id}`)}</span>
           <span class="contact-time">${c.lastTime}</span>
         </div>
-        <div class="contact-preview ${c.unread > 0 ? 'font-600' : ''}">${c.lastMsg}</div>
+        <div class="contact-preview ${c.unread > 0 ? 'font-600' : ''}">${escapeHtml(c.name)} — ${escapeHtml(c.lastMsg)}</div>
       </div>
       ${c.unread > 0 ? `<div class="unread-badge">${c.unread}</div>` : ''}
     </div>
@@ -788,7 +838,7 @@ function sendMessage() {
     from: 'me',
     text,
     time: timeStr,
-    date: 'Today',
+    date: dateLabel(now),
     read: false,
   };
 
@@ -806,8 +856,17 @@ function sendMessage() {
   const contactEl = document.getElementById(`contact-${activeConversationId}`);
   if (contactEl) contactEl.classList.add('active');
 
-  // API call:
-  // apiPost(`/contractor/messages/${activeConversationId}/send`, { text });
+  fetch('/api/sendMessagesContractor', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ticket_id: activeConversationId, content: text })
+  }).then(r => {
+    if (!r.ok) throw new Error('Failed to send');
+    return r.json();
+  }).catch(err => {
+    console.error(err);
+    showToast('Failed to send message', 'error');
+  });
 }
 
 /* ── Handle Enter Key ───────────────────────────────────────── */

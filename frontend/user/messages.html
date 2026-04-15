@@ -156,6 +156,9 @@ function processMessages(messages) {
             ticketOrder.push(tid);
         }
 
+        // Skip null messages - they only acknowledge ticket existence
+        if (msg.message === null) return;
+
         const type = msg.user_id !== null ? 'sent' : 'received';
         conversations[tid].push({ type, text: msg.message });
     });
@@ -166,11 +169,19 @@ function processMessages(messages) {
         const lastMsg = msgs[msgs.length - 1];
         const existing = ticketMeta[tid] || {};
 
-        ticketMeta[tid] = {
+        if (lastMsg?.text) {
+            ticketMeta[tid] = {
             ...resolveTechMeta(tid, index),
             ...existing,
-            preview: lastMsg ? lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '…' : '') : ''
-        };
+            preview: lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '…' : '')
+            };
+        } else {
+            ticketMeta[tid] = {
+            ...resolveTechMeta(tid, index),
+            ...existing,
+            preview: ''
+            };
+        }
     });
 
     return ticketOrder;

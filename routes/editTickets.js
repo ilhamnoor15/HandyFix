@@ -535,11 +535,24 @@ user_id	INT
 contractor_id	INT	
 message	VARCHAR(100)	
 messager_id	INT	
-message_date	DATE*/
+message_date	DATE.
+
+like
+ticket_id=5, user_id=1, message=null, messager_id=null, message_date=current date
+ticket_id=5, contractor_id=1, message=null, messager_id=null, message_date=current date
+important 2 queries seperate. one for with user_id, other for contractor_id. because messages are fetched with user_id and contractor_id, if both are null, messages are not fetched. so we need to insert 2 rows for each ticket assignment, one with user_id and other with contractor_id, both with null message and current date. so when messages are fetched, it will return an empty array instead of null, and the messages nav will be displayed. if we dont do this, messages nav will not be displayed because messages are null, even though there is an assignment and a ticket.
+*/
+
     await db.execute(
-      `INSERT INTO messages (ticket_id, user_id, contractor_id, message, messager_id, message_date) 
-       VALUES (?, (SELECT id FROM users WHERE email = ?), ?, '', (SELECT id FROM users WHERE email = ?), datetime('now', '+1 day'))`,
-      [ticketId, email, contractorId, email],
+      `INSERT INTO messages (ticket_id, user_id, message, messager_id, message_date) 
+       VALUES (?, (SELECT user_id FROM assignments WHERE ticket_id = ?), NULL, NULL, datetime('now'))`,
+      [ticketId, ticketId],
+    );
+
+    await db.execute(
+      `INSERT INTO messages (ticket_id, contractor_id, message, messager_id, message_date) 
+       VALUES (?, (SELECT contractor_id FROM assignments WHERE ticket_id = ?), NULL, NULL, datetime('now'))`,
+      [ticketId, ticketId],
     );
     res.json({ message: "Contractor assigned successfully" });
   } catch (err) {
